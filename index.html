@@ -234,6 +234,12 @@ body{max-width:480px;margin:0 auto;overflow-x:hidden;}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0d2b1a;border:1.5px solid var(--green);color:var(--green);padding:9px 18px;border-radius:10px;font-weight:600;font-size:12px;opacity:0;transition:.3s;z-index:9990;white-space:nowrap;pointer-events:none;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .toast.err{background:#2b0d0d;border-color:var(--red);color:var(--red);}
+.pd-row{display:grid;grid-template-columns:1fr 2fr 2fr;gap:4px;padding:5px 2px;border-radius:6px;font-size:12px;margin-bottom:3px;}
+.pd-paid{background:rgba(39,174,96,.08);}
+.pd-pend{background:rgba(231,76,60,.05);}
+.pd-mo{font-weight:700;color:var(--orange);}
+.pd-date{color:var(--muted);}
+.pd-amt{font-weight:600;color:var(--green);}
 @media(max-width:360px){.home-title{font-size:20px;}.mobtn,.mwbtn{padding:6px 9px;font-size:11px;}.atab .al{font-size:9px;}}
 </style>
 </head>
@@ -555,6 +561,18 @@ function setSyncUI(s, msg){
 }
 
 function pushDB(){
+  // Clean empty members before saving
+  if(DB.members){
+    Object.keys(DB.members).forEach(gi => {
+      if(DB.members[gi]){
+        Object.keys(DB.members[gi]).forEach(mid => {
+          if(!DB.members[gi][mid] || !DB.members[gi][mid].name){
+            delete DB.members[gi][mid];
+          }
+        });
+      }
+    });
+  }
   setSyncUI('busy','Saving…');
   const toSave = JSON.parse(JSON.stringify(DB));
   DB_REF.set(toSave).then(() => {
@@ -643,7 +661,7 @@ function tryLogin(){
 function updateHomeStats(){
   document.getElementById('h-months').textContent = DB.org.months;
   let t = 0;
-  Object.values(DB.members||{}).forEach(g => t += Object.keys(g||{}).length);
+  Object.values(DB.members||{}).forEach(g => t += Object.values(g||{}).filter(m=>m&&m.name).length);
   document.getElementById('h-members').textContent = t || '—';
   const a = DB.org.amount;
   document.getElementById('h-amt').textContent = a>=100000 ? '₹'+(a/100000).toFixed(1).replace('.0','')+'L' : '₹'+(a/1000).toFixed(0)+'K';
@@ -652,14 +670,14 @@ function updateHomeStats(){
 function updatePubStats(){
   document.getElementById('pub-title').textContent = DB.org.name;
   document.getElementById('p-mo').textContent = DB.org.months;
-  document.getElementById('p-mem').textContent = Object.keys(DB.members[CG]||{}).length;
+  document.getElementById('p-mem').textContent = Object.values(DB.members[CG]||{}).filter(m=>m&&m.name).length;
   document.getElementById('p-amt').textContent = '₹'+DB.org.amount.toLocaleString('en-IN');
 }
 
 function updateAdmStats(){
   document.getElementById('adm-title').textContent = DB.org.name;
   document.getElementById('a-mo').textContent = DB.org.months;
-  document.getElementById('a-mem').textContent = Object.keys(DB.members[CG]||{}).length;
+  document.getElementById('a-mem').textContent = Object.values(DB.members[CG]||{}).filter(m=>m&&m.name).length;
   document.getElementById('a-amt').textContent = '₹'+DB.org.amount.toLocaleString('en-IN');
 }
 
@@ -729,6 +747,11 @@ function renderPub(){
   });
 }
 
+function togglePubDetail(id){
+  const el = document.getElementById(id);
+  if(el) el.style.display = el.style.display==='none' ? 'block' : 'none';
+}
+
 function switchPT(t){
   CPT = t;
   ['mem','mw','prz'].forEach(x => {
@@ -743,8 +766,7 @@ function switchPT(t){
 
 function renderPubSummary(){
   ensureGroup(CG);
-  const mids = Object.keys(DB.members[CG]||{});
-  let total = 0;
+  const mids = Object.keys(DB.members[CG]||{}).filter(mid => DB.members[CG][mid] && DB.members[CG][mid].name);
   mids.forEach(mid => {
     for(let m=1; m<=DB.org.months; m++){
       const p = DB.payments[CG] && DB.payments[CG][m] && DB.payments[CG][m][mid];
@@ -764,14 +786,16 @@ function renderPubSummary(){
 function renderPubMembers(){
   ensureGroup(CG);
   const el = document.getElementById('pub-mem-view'); el.innerHTML = '';
-  const mids = Object.keys(DB.members[CG]||{});
+  const mids = Object.keys(DB.members[CG]||{}).filter(mid => DB.members[CG][mid] && DB.members[CG][mid].name);
   if(!mids.length){
     el.innerHTML='<div class="empty-state"><div class="ei">👥</div><div class="et">உறுப்பினர்கள் இல்லை</div><div class="es">No members added yet.<br>Admin → Members-ல் add பண்ணவும்.</div></div>';
     return;
   }
-  mids.forEach((mid, idx) => {
+  let num = 0;
+  mids.forEach((mid) => {
     const mem = DB.members[CG][mid];
     if(!mem) return;
+    num++;
     let pc=0, tot=0;
     for(let m=1; m<=DB.org.months; m++){
       const p = DB.payments[CG] && DB.payments[CG][m] && DB.payments[CG][m][mid];
@@ -783,18 +807,42 @@ function renderPubMembers(){
       const paid = DB.payments[CG] && DB.payments[CG][m] && DB.payments[CG][m][mid] && DB.payments[CG][m][mid].paid;
       dots += `<div class="mdot2${paid?' paid':''}">${m}</div>`;
     }
+    let detailRows = '';
+    for(let m=1; m<=DB.org.months; m++){
+      const p = DB.payments[CG] && DB.payments[CG][m] && DB.payments[CG][m][mid];
+      if(p && p.paid){
+        detailRows += `<div class="pd-row pd-paid"><span class="pd-mo">M${m}</span><span class="pd-date">${p.date||'—'}</span><span class="pd-amt">₹${Number(p.amount).toLocaleString('en-IN')} ✓</span></div>`;
+      } else {
+        detailRows += `<div class="pd-row pd-pend"><span class="pd-mo">M${m}</span><span class="pd-date">—</span><span class="pd-amt" style="color:var(--red)">Pending</span></div>`;
+      }
+    }
+    const cardNum = num;
     const card = document.createElement('div');
     card.className = 'mpc'+(allP?' ap':hasP?' hp':'');
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', function(){ 
+      const det = document.getElementById('pd-'+cardNum);
+      if(det) det.style.display = det.style.display==='none'?'block':'none';
+    });
     card.innerHTML=`
       <div class="mpc-top">
-        <div class="mpc-num${allP?' ap':''}">${idx+1}</div>
+        <div class="mpc-num${allP?' ap':''}">${num}</div>
         <div class="mpc-info">
           <div class="mpc-name">${mem.name||'—'}</div>
           <div class="mpc-sub">${pc}/${DB.org.months} months • ${Math.round(pc/DB.org.months*100)}% paid</div>
         </div>
-        <div class="mpc-total${allP?' full':''}">₹${tot.toLocaleString('en-IN')}</div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
+          <div class="mpc-total${allP?' full':''}">₹${tot.toLocaleString('en-IN')}</div>
+          <div style="font-size:10px;color:var(--muted);">▾ தகவல்</div>
+        </div>
       </div>
-      <div class="month-dots">${dots}</div>`;
+      <div class="month-dots">${dots}</div>
+      <div id="pd-${num}" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:8px;">
+        <div style="display:grid;grid-template-columns:1fr 2fr 2fr;gap:4px;font-size:10px;color:var(--muted);font-weight:600;margin-bottom:6px;padding:0 2px;">
+          <span>Month</span><span>Date</span><span>Amount</span>
+        </div>
+        ${detailRows}
+      </div>`;
     el.appendChild(card);
   });
 }
@@ -802,7 +850,7 @@ function renderPubMembers(){
 function renderPubMW(){
   ensureGroup(CG);
   const el = document.getElementById('pub-mw-view'); el.innerHTML = '';
-  const mids = Object.keys(DB.members[CG]||{});
+  const mids = Object.keys(DB.members[CG]||{}).filter(mid => DB.members[CG][mid] && DB.members[CG][mid].name);
   let sel = '<div class="mw-sel">';
   for(let m=1; m<=DB.org.months; m++){
     const pc = mids.filter(mid => DB.payments[CG] && DB.payments[CG][m] && DB.payments[CG][m][mid] && DB.payments[CG][m][mid].paid).length;
@@ -815,12 +863,14 @@ function renderPubMW(){
   if(!mids.length){
     list += '<div class="empty-state"><div class="ei">📅</div><div class="et">No members yet</div></div>';
   } else {
-    mids.forEach((mid, idx) => {
+    let mwNum = 0;
+    mids.forEach((mid) => {
       const mem = DB.members[CG][mid];
       if(!mem) return;
+      mwNum++;
       const p = (DB.payments[CG] && DB.payments[CG][CM] && DB.payments[CG][CM][mid]) || {paid:false, amount:DB.org.amount};
       list += `<div class="mw-row${p.paid?' paid':''}">
-        <div class="mwnum${p.paid?' p':''}">${idx+1}</div>
+        <div class="mwnum${p.paid?' p':''}">${mwNum}</div>
         <div class="mw-name">${mem.name||'—'}</div>
         ${p.paid ? `<div class="mw-amt">₹${Number(p.amount).toLocaleString('en-IN')} ✓</div>` : `<div class="mw-pend">Pending</div>`}
       </div>`;
@@ -882,7 +932,7 @@ function switchAT(t){
 function renderMonthGrid(){
   const el = document.getElementById('mo-grid'); if(!el) return;
   el.innerHTML = '';
-  const mids = Object.keys(DB.members[CG]||{});
+  const mids = Object.keys(DB.members[CG]||{}).filter(mid => DB.members[CG][mid] && DB.members[CG][mid].name);
   for(let m=1; m<=DB.org.months; m++){
     const pc = mids.filter(mid => DB.payments[CG] && DB.payments[CG][m] && DB.payments[CG][m][mid] && DB.payments[CG][m][mid].paid).length;
     const allP = mids.length > 0 && pc === mids.length;
@@ -897,7 +947,7 @@ function renderMonthGrid(){
 function renderPayments(){
   ensureGroup(CG);
   renderMonthGrid();
-  const mids = Object.keys(DB.members[CG]||{});
+  const mids = Object.keys(DB.members[CG]||{}).filter(mid => DB.members[CG][mid] && DB.members[CG][mid].name);
   const pc = mids.filter(mid => DB.payments[CG] && DB.payments[CG][CM] && DB.payments[CG][CM][mid] && DB.payments[CG][CM][mid].paid).length;
   document.getElementById('pb-lbl').textContent = 'Month '+CM+' Payments';
   document.getElementById('pb-cnt').textContent = pc+'/'+mids.length+' paid';
@@ -907,9 +957,11 @@ function renderPayments(){
     c.innerHTML='<div class="empty-state"><div class="ei">👥</div><div class="et">உறுப்பினர்கள் இல்லை</div><div class="es">Members tab-ல் add பண்ணவும்.</div></div>';
     return;
   }
-  mids.forEach((mid, idx) => {
+  let payNum = 0;
+  mids.forEach((mid) => {
     const mem = DB.members[CG][mid];
     if(!mem) return;
+    payNum++;
     if(!DB.payments[CG][CM]) DB.payments[CG][CM] = {};
     if(!DB.payments[CG][CM][mid]) DB.payments[CG][CM][mid] = {date:todayStr(), amount:DB.org.amount, paid:false};
     const p = DB.payments[CG][CM][mid];
@@ -917,7 +969,7 @@ function renderPayments(){
     div.className = 'pcard'+(p.paid?' pd':'');
     div.innerHTML=`
       <div class="pcard-hdr" onclick="toggleBody('pb-${mid}')">
-        <div class="pnum${p.paid?' p':''}">${idx+1}</div>
+        <div class="pnum${p.paid?' p':''}">${payNum}</div>
         <div class="pcard-name">${mem.name||'—'}</div>
         <div>${p.paid?'✅':'⏳'}</div>
       </div>
@@ -1013,16 +1065,18 @@ function renderMemAdm(){
   const el = document.getElementById('mem-adm-list');
   if(!el){ console.warn('mem-adm-list not found'); return; }
   el.innerHTML = '';
-  const mids = Object.keys(DB.members[CG]||{});
+  const mids = Object.keys(DB.members[CG]||{}).filter(mid => DB.members[CG][mid] && DB.members[CG][mid].name);
   if(!mids.length){
     el.innerHTML='<div class="empty-state"><div class="ei">👥</div><div class="et">உறுப்பினர்கள் இல்லை</div><div class="es">கீழே உள்ள button-ல் member add பண்ணவும்.</div></div>';
   } else {
-    mids.forEach((mid, idx) => {
+    let num = 0;
+    mids.forEach((mid) => {
       const mem = DB.members[CG][mid];
       if(!mem) return;
+      num++;
       const div = document.createElement('div'); div.className = 'memc';
       div.innerHTML=`<div class="memc-row">
-        <div class="memc-av">${idx+1}</div>
+        <div class="memc-av">${num}</div>
         <div class="memc-info">
           <div class="memc-name">${mem.name||'—'}</div>
           <div class="memc-phone">📞 ${mem.phone||'—'}</div>
