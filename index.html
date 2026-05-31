@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>KMBSC Savings சீட்டு</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{--bg:#0f1322;--card:#1a2236;--card2:#1f2a40;--orange:#ffb830;--green:#2ecc71;--red:#ff4757;--blue:#54a0ff;--text:#f0f4ff;--muted:#a0b0cc;--border:#2a3650;}
+html,body{background:var(--bg);color:var(--text);font-family:'Poppins','Noto Sans Tamil',sans-serif;font-size:14px;min-height:100%;}
+body{max-width:480px;margin:0 auto;overflow-x:hidden;}
+.page{display:none;}.page.active{display:block;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* HOME */
+.home-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;}
+.home-logo{width:88px;height:88px;background:var(--orange);border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:44px;margin-bottom:18px;box-shadow:0 8px 30px rgba(245,166,35,.45);}
+.home-title{font-size:24px;font-weight:800;text-align:center;margin-bottom:4px;}
+.home-title span{color:var(--orange);}
+.home-sub{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:10px;}
+.live-pill{display:inline-flex;align-items:center;gap:6px;background:#0d2b1a;border:1.5px solid var(--green);color:var(--green);font-size:12px;font-weight:600;padding:4px 14px;border-radius:20px;margin-bottom:28px;}
+.ldot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:blink 1.4s infinite;}
+.home-stats{display:flex;gap:10px;width:100%;margin-bottom:28px;}
+.hstat{flex:1;background:var(--card);border-radius:12px;padding:12px 8px;text-align:center;border:1.5px solid var(--border);}
+.hstat-icon{font-size:20px;margin-bottom:3px;}
+.hstat-val{font-size:15px;font-weight:800;color:var(--orange);}
+.hstat-lbl{font-size:9px;color:var(--muted);margin-top:2px;}
+.home-btns{display:flex;flex-direction:column;gap:12px;width:100%;}
+.hbtn{width:100%;padding:18px;border-radius:14px;border:none;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:14px;transition:.15s;text-align:left;}
+.hbtn:active{transform:scale(.98);}
+.hbtn-pub{background:var(--card2);border:1.5px solid var(--border);color:var(--text);}
+.hbtn-adm{background:var(--orange);color:#1a0f00;box-shadow:0 4px 20px rgba(245,166,35,.4);}
+.hbtn-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.hbi-pub{background:rgba(255,255,255,.08);}
+.hbi-adm{background:rgba(26,15,0,.2);}
+.hbtn-text{flex:1;}
+.hbtn-title{font-size:15px;font-weight:700;line-height:1.2;}
+.hbtn-desc{font-size:11px;opacity:.65;margin-top:2px;}
+
+/* LOCK */
+.lock-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;}
+.lock-logo{width:70px;height:70px;background:var(--orange);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:34px;margin-bottom:14px;box-shadow:0 6px 20px rgba(245,166,35,.4);}
+.lock-title{font-size:20px;font-weight:800;margin-bottom:4px;}
+.lock-sub{font-size:12px;color:var(--muted);margin-bottom:26px;text-align:center;}
+.lock-card{background:var(--card);border-radius:16px;padding:22px;width:100%;border:1.5px solid var(--border);}
+.lock-lbl{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.5px;margin-bottom:6px;}
+.lock-inp{width:100%;padding:13px 16px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:20px;font-weight:600;outline:none;letter-spacing:6px;text-align:center;}
+.lock-inp:focus{border-color:var(--orange);}
+.lock-inp.shake{animation:shake .4s;}
+.lock-btn{width:100%;margin-top:14px;padding:14px;background:var(--orange);border:none;border-radius:10px;font-family:inherit;font-size:15px;font-weight:700;color:#1a0f00;cursor:pointer;}
+.lock-err{color:var(--red);font-size:12px;text-align:center;margin-top:10px;min-height:18px;}
+.lock-back{margin-top:18px;background:transparent;border:none;color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer;}
+
+/* APP HEADER */
+.app-hdr{background:var(--card);border-bottom:1px solid var(--border);}
+.app-hdr-top{display:flex;align-items:center;gap:10px;padding:11px 16px 7px;}
+.back-btn{background:transparent;border:none;color:var(--orange);font-size:22px;cursor:pointer;padding:0;line-height:1;flex-shrink:0;}
+.app-logo{width:40px;height:40px;background:var(--orange);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.app-hdr-info{flex:1;}
+.app-hdr-title{font-size:16px;font-weight:700;line-height:1.2;}
+.app-hdr-sub{font-size:9px;font-weight:600;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;}
+.app-live{background:#0d2b1a;border:1.5px solid var(--green);color:var(--green);font-size:11px;font-weight:600;padding:3px 9px;border-radius:16px;display:flex;align-items:center;gap:4px;white-space:nowrap;}
+.app-hdr-stats{display:flex;gap:12px;flex-wrap:wrap;padding:0 16px 8px;}
+.astat{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);}
+.astat b{color:var(--text);font-weight:600;}
+
+/* SYNC BAR */
+.sync-bar{background:#0c1525;border-bottom:1px solid var(--border);padding:5px 16px;display:flex;align-items:center;justify-content:space-between;}
+.sync-left{display:flex;align-items:center;gap:6px;font-size:11px;}
+.sdot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0;}
+.sdot.ok{background:var(--green);}
+.sdot.busy{background:var(--orange);animation:blink .8s infinite;}
+.sdot.err{background:var(--red);}
+.sync-lbl{color:var(--muted);}
+.sync-lbl.ok{color:var(--green);}
+.sync-lbl.err{color:var(--red);}
+.sync-time{font-size:10px;color:var(--muted);}
+.sync-refresh{background:transparent;border:1px solid var(--border);border-radius:5px;color:var(--muted);font-family:inherit;font-size:10px;padding:3px 8px;cursor:pointer;}
+
+/* GROUP TABS */
+.grp-tabs{display:flex;background:var(--card2);border-radius:12px;margin:10px 16px 0;padding:4px;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.grp-tab{flex-shrink:0;padding:9px;border-radius:9px;border:none;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);background:transparent;transition:.2s;}
+.grp-tab.active{background:var(--orange);color:#1a0f00;box-shadow:0 3px 10px rgba(245,166,35,.4);}
+
+/* PUBLIC */
+.pub-body{padding:0 0 80px;}
+.sum-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 16px 0;}
+.sum-card{background:var(--card2);border-radius:12px;padding:13px 8px;text-align:center;border:1.5px solid var(--border);}
+.sc-icon{font-size:22px;margin-bottom:4px;}
+.sc-val{font-size:14px;font-weight:800;color:var(--orange);}
+.sc-lbl{font-size:9px;color:var(--muted);margin-top:3px;line-height:1.3;}
+.sub-tabs{display:flex;background:var(--card2);border-radius:12px;margin:12px 16px 0;overflow:hidden;}
+.stab{flex:1;padding:11px 4px;border:none;background:transparent;font-family:inherit;cursor:pointer;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;transition:.2s;}
+.stab .si{font-size:18px;}.stab .sl{font-size:11px;font-weight:600;}.stab .st{font-size:9px;color:var(--muted);}
+.stab.active{background:var(--orange);color:#1a0f00;}.stab.active .st{color:#6b3e00;}
+.mem-cards{margin:12px 16px 0;display:flex;flex-direction:column;gap:10px;}
+.mpc{background:var(--card2);border-radius:14px;border:1.5px solid var(--border);padding:14px;position:relative;overflow:hidden;}
+.mpc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--border);}
+.mpc.hp::before{background:var(--orange);}
+.mpc.ap::before{background:var(--green);}
+.mpc-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.mpc-num{width:38px;height:38px;border-radius:10px;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--orange);border:2px solid var(--orange);flex-shrink:0;}
+.mpc-num.ap{color:var(--green);border-color:var(--green);}
+.mpc-info{flex:1;}
+.mpc-name{font-size:15px;font-weight:700;}
+.mpc-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.mpc-total{font-size:16px;font-weight:800;color:var(--orange);}
+.mpc-total.full{color:var(--green);}
+.month-dots{display:flex;flex-wrap:wrap;gap:5px;}
+.mdot2{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:1.5px solid var(--border);background:var(--card);color:var(--muted);}
+.mdot2.paid{background:var(--orange);border-color:var(--orange);color:#1a0f00;}
+.mw-wrap{margin:12px 16px 0;}
+.mw-sel{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.mwbtn{padding:6px 9px;border-radius:8px;border:1.5px solid var(--border);background:var(--card2);font-family:inherit;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;transition:.2s;position:relative;}
+.mwbtn.active{background:var(--orange);border-color:var(--orange);color:#1a0f00;}
+.mwbtn.allp{border-color:var(--green);color:var(--green);}
+.mwbtn .mtick{position:absolute;top:-4px;right:-4px;width:13px;height:13px;background:var(--green);border-radius:50%;font-size:8px;display:flex;align-items:center;justify-content:center;color:#fff;}
+.mw-summary{background:var(--card2);border-radius:10px;padding:11px 14px;display:flex;justify-content:space-between;margin-bottom:10px;border:1.5px solid var(--orange);}
+.mws-lbl{font-size:13px;font-weight:700;color:var(--orange);}
+.mw-list{display:flex;flex-direction:column;gap:7px;}
+.mw-row{background:var(--card2);border-radius:10px;padding:11px 13px;display:flex;align-items:center;gap:10px;border:1.5px solid var(--border);}
+.mw-row.paid{border-color:rgba(39,174,96,.4);}
+.mwnum{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#1a0f00;background:var(--orange);flex-shrink:0;}
+.mwnum.p{background:var(--green);}
+.mw-name{flex:1;font-size:13px;font-weight:600;}
+.mw-amt{font-size:13px;font-weight:700;color:var(--green);}
+.mw-pend{font-size:12px;color:var(--red);}
+.prize-pub-list{margin:12px 16px 0;display:flex;flex-direction:column;gap:8px;}
+.ppc{background:var(--card2);border-radius:12px;border:1.5px solid var(--border);padding:13px;display:flex;align-items:center;gap:12px;}
+.ppc.won{border-color:rgba(245,166,35,.4);}
+.ppc-mo{width:38px;height:38px;background:var(--card);border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;border:1.5px solid var(--border);}
+.ppc-mn{font-size:14px;font-weight:800;color:var(--orange);}
+.ppc-ml{font-size:8px;color:var(--muted);}
+.ppc-info{flex:1;}
+.ppc-winner{font-size:14px;font-weight:700;}
+.ppc-winner.empty{color:var(--muted);font-style:italic;font-size:12px;}
+.ppc-bid{font-size:11px;color:var(--muted);margin-top:2px;}
+.ppc-amt{font-size:16px;font-weight:800;color:var(--orange);}
+
+/* ADMIN */
+.adm-body{padding:0 0 90px;}
+.sec-ttl{background:var(--card2);border-radius:10px;margin:12px 16px 0;padding:12px 16px;font-size:14px;font-weight:700;color:var(--orange);}
+.adm-tabs{display:flex;background:var(--card2);border-radius:12px;margin:10px 16px 0;overflow:hidden;}
+.atab{flex:1;padding:11px 4px;border:none;background:transparent;font-family:inherit;cursor:pointer;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;transition:.2s;}
+.atab .ai{font-size:17px;}.atab .al{font-size:10px;font-weight:600;}.atab .at2{font-size:9px;color:var(--muted);}
+.atab.active{background:var(--orange);color:#1a0f00;}.atab.active .at2{color:#6b3e00;}
+.mo-wrap{margin:12px 16px 0;}
+.mo-grid{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px;}
+.mobtn{padding:6px 9px;border-radius:8px;border:1.5px solid var(--border);background:var(--card2);font-family:inherit;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;transition:.2s;position:relative;}
+.mobtn.active{background:var(--orange);border-color:var(--orange);color:#1a0f00;}
+.mobtn.allp{border-color:var(--green);color:var(--green);}
+.mobtn .mtk{position:absolute;top:-4px;right:-4px;width:13px;height:13px;background:var(--green);border-radius:50%;font-size:8px;display:flex;align-items:center;justify-content:center;color:#fff;}
+.pay-bar{background:var(--card2);border-radius:10px;margin:10px 16px 0;padding:11px 14px;}
+.pay-bar-row{display:flex;justify-content:space-between;align-items:center;}
+.pb-lbl{font-size:13px;font-weight:700;color:var(--orange);}
+.prog{height:4px;background:var(--border);border-radius:2px;margin-top:7px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--orange);border-radius:2px;transition:width .5s;}
+.pay-cards{margin:10px 16px 0;display:flex;flex-direction:column;gap:8px;}
+.pcard{background:var(--card2);border-radius:12px;border:1.5px solid var(--border);overflow:hidden;}
+.pcard.pd{border-color:rgba(39,174,96,.5);}
+.pcard-hdr{display:flex;align-items:center;padding:11px 13px;gap:9px;cursor:pointer;user-select:none;}
+.pnum{width:34px;height:34px;background:var(--orange);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#1a0f00;flex-shrink:0;}
+.pnum.p{background:var(--green);}
+.pcard-name{flex:1;font-size:13px;font-weight:600;}
+.pcard-body{padding:0 13px 13px;display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.mf label{display:block;font-size:10px;color:var(--muted);margin-bottom:3px;font-weight:500;}
+.mf input{width:100%;padding:9px 11px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:13px;font-weight:600;outline:none;-webkit-appearance:none;}
+.mf input:focus{border-color:var(--orange);}
+.mf input.pv{border-color:rgba(39,174,96,.5);color:var(--green);}
+.paid-strip{grid-column:span 2;background:rgba(39,174,96,.1);border:1px solid rgba(39,174,96,.3);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:600;color:var(--green);}
+.act-btn{width:100%;padding:10px;border-radius:8px;border:none;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;}
+.btn-pay{background:var(--orange);color:#1a0f00;}
+.btn-wa{background:#25D366;color:#fff;border:none;border-radius:8px;padding:9px 12px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;width:100%;}
+.btn-wa:active{background:#1ebe57;}
+.wa-icon{width:16px;height:16px;fill:#fff;}
+.btn-wa-bulk{width:100%;margin-top:8px;padding:9px 14px;background:#128C7E;border:none;border-radius:8px;color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;}
+.btn-wa-bulk:active{background:#0d6b5f;}
+.btn-unpay{background:rgba(231,76,60,.15);color:#e74c3c;border:1.5px solid rgba(231,76,60,.3);}
+.save-btn{display:block;width:calc(100% - 32px);margin:12px 16px 0;padding:13px;background:var(--orange);border:none;border-radius:12px;font-family:inherit;font-size:14px;font-weight:700;color:#1a0f00;cursor:pointer;box-shadow:0 4px 15px rgba(245,166,35,.4);}
+.prz-adm{padding:12px 16px 0;}
+.prz-card{background:var(--card2);border-radius:12px;border:1.5px solid var(--border);padding:13px;margin-bottom:9px;}
+.prz-card input,.prz-card select{width:100%;padding:8px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:12px;font-weight:600;outline:none;-webkit-appearance:none;appearance:none;}
+.prz-card input:focus,.prz-card select:focus{border-color:var(--orange);}
+.pz-lbl{font-size:10px;color:var(--muted);margin-bottom:3px;font-weight:500;display:block;}
+.mem-adm{padding:12px 16px 0;}
+.memc{background:var(--card2);border-radius:12px;border:1.5px solid var(--border);padding:13px;margin-bottom:9px;animation:fadein .2s ease;}
+.memc-row{display:flex;align-items:center;gap:9px;}
+.memc-av{width:38px;height:38px;background:var(--orange);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#1a0f00;flex-shrink:0;}
+.memc-info{flex:1;}
+.memc-name{font-size:13px;font-weight:700;}
+.memc-phone{font-size:11px;color:var(--muted);}
+.memc-acts{display:flex;gap:6px;}
+.medit{padding:5px 10px;border-radius:7px;background:rgba(52,152,219,.15);border:1px solid rgba(52,152,219,.3);color:var(--blue);font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;}
+.mdel{padding:5px 10px;border-radius:7px;background:rgba(231,76,60,.12);border:1px solid rgba(231,76,60,.25);color:var(--red);font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;}
+.add-mem-btn{width:100%;padding:12px;border-radius:10px;border:1.5px dashed rgba(245,166,35,.5);background:rgba(245,166,35,.08);color:var(--orange);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+.empty-state{text-align:center;padding:32px 20px;color:var(--muted);}
+.empty-state .ei{font-size:40px;margin-bottom:10px;}
+.empty-state .et{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.empty-state .es{font-size:12px;}
+.cfg-wrap{padding:12px 16px 0;}
+.cfg-card{background:var(--card2);border-radius:12px;border:1.5px solid var(--border);padding:15px;margin-bottom:12px;}
+.cfg-title{font-size:13px;font-weight:700;color:var(--orange);margin-bottom:12px;}
+.cfg-field{margin-bottom:10px;}
+.cfg-field label{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:5px;display:block;}
+.cfg-field input{width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:13px;outline:none;}
+.cfg-field input:focus{border-color:var(--orange);}
+.cfg-2col{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.cfg-btn{width:100%;padding:11px;border-radius:9px;border:none;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;background:var(--orange);color:#1a0f00;margin-top:4px;}
+.grp-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+.grp-row input{flex:1;padding:9px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:13px;outline:none;}
+.grp-row input:focus{border-color:var(--orange);}
+.grp-del{padding:6px 10px;background:rgba(231,76,60,.12);border:1px solid rgba(231,76,60,.25);border-radius:8px;color:var(--red);font-size:13px;cursor:pointer;flex-shrink:0;}
+.add-grp-btn{width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(245,166,35,.4);background:rgba(245,166,35,.07);color:var(--orange);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;margin-top:10px;}
+.grp-cfg-card{background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;}
+.grp-cfg-hdr{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.grp-cfg-num{width:26px;height:26px;background:var(--orange);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#1a0f00;flex-shrink:0;}
+.grp-cfg-name{flex:1;padding:7px 10px;background:var(--card2);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:14px;font-weight:700;outline:none;}
+.grp-cfg-name:focus{border-color:var(--orange);}
+.grp-cfg-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.gcf{display:flex;flex-direction:column;gap:4px;}
+.gcf label{font-size:10px;color:var(--muted);font-weight:600;}
+.gcf input,.gcf select{padding:7px 9px;background:var(--card2);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:13px;outline:none;}
+.gcf input:focus,.gcf select:focus{border-color:var(--orange);}
+.gcf select option{background:var(--card);}
+.gcf-full{grid-column:1/-1;}
+.gcf-save{width:100%;padding:9px;background:rgba(245,166,35,.15);border:1.5px solid rgba(245,166,35,.4);border-radius:8px;color:var(--orange);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;}
+.gcf-save:active{background:rgba(245,166,35,.3);}
+.logout-btn{width:100%;padding:12px;border-radius:9px;background:rgba(231,76,60,.12);border:1.5px solid rgba(231,76,60,.3);color:var(--red);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:16px;}
+.modal-ov{position:fixed;inset:0;background:rgba(10,14,26,.92);z-index:99999;display:flex;align-items:center;justify-content:center;}
+.modal-ov.hide{display:none;}
+.modal-box{background:var(--card);border-radius:16px;padding:22px 20px 28px;width:90%;max-width:420px;border:1px solid var(--border);}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.modal-ttl{font-size:16px;font-weight:700;}
+.modal-cls{background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;}
+.mfield{margin-bottom:11px;}
+.mfield label{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:5px;display:block;}
+.mfield input{width:100%;padding:11px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:inherit;font-size:14px;outline:none;}
+.mfield input:focus{border-color:var(--orange);}
+.mbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.mb-ok{padding:12px;border-radius:9px;border:none;background:var(--orange);color:#1a0f00;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;}
+.mb-cancel{padding:12px;border-radius:9px;background:var(--card2);color:var(--muted);border:none;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;}
+.spin-overlay{position:fixed;inset:0;background:rgba(26,31,46,.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
+.spin-overlay.hide{display:none;}
+.spinner{width:44px;height:44px;border:4px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite;}
+.spin-txt{font-size:13px;color:var(--muted);}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0d2b1a;border:1.5px solid var(--green);color:var(--green);padding:9px 18px;border-radius:10px;font-weight:600;font-size:12px;opacity:0;transition:.3s;z-index:9990;white-space:nowrap;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.err{background:#2b0d0d;border-color:var(--red);color:var(--red);}
+.pd-row{display:grid;grid-template-columns:1fr 2fr 2fr;gap:4px;padding:5px 2px;border-radius:6px;font-size:12px;margin-bottom:3px;}
+.pd-paid{background:rgba(39,174,96,.08);}
+.pd-pend{background:rgba(231,76,60,.05);}
+.pd-mo{font-weight:700;color:var(--orange);}
+.pd-date{color:var(--muted);}
+.pd-amt{font-weight:600;color:var(--green);}
+@media(max-width:360px){.home-title{font-size:20px;}.mobtn,.mwbtn{padding:6px 9px;font-size:11px;}.atab .al{font-size:9px;}}
+</style>
+</head>
+<body>
+
+<div class="spin-overlay hide" id="spinner">
+  <div class="spinner"></div>
+  <div class="spin-txt" id="spin-txt">Connecting… 🔥</div>
+</div>
+
+<!-- HOME -->
+<div class="page active" id="pg-home">
+  <div class="home-wrap">
+    <div class="home-logo">🏛️</div>
+    <div class="home-title">KMBSC Savings <span>சீட்டு</span></div>
+    <div class="home-sub">Kovil Mutual Benefit Savings Chit</div>
+    <div class="live-pill"><span class="ldot"></span>Live</div>
+    <div class="home-stats">
+      <div class="hstat"><div class="hstat-icon">📅</div><div class="hstat-val" id="h-months">11</div><div class="hstat-lbl">Groups</div></div>
+      <div class="hstat"><div class="hstat-icon">👥</div><div class="hstat-val" id="h-members">—</div><div class="hstat-lbl">Members</div></div>
+      <div class="hstat"><div class="hstat-icon">💰</div><div class="hstat-val" id="h-amt">₹1L</div><div class="hstat-lbl">Monthly</div></div>
+    </div>
+    <div class="home-btns">
+      <button class="hbtn hbtn-pub" onclick="goPub()">
+        <div class="hbtn-icon hbi-pub">🏠</div>
+        <div class="hbtn-text"><div class="hbtn-title">Public View / பொது பார்வை</div><div class="hbtn-desc">Members, payments & prize list</div></div>
+        <span style="color:var(--muted);font-size:20px;">›</span>
+      </button>
+      <button class="hbtn hbtn-adm" onclick="goLock()">
+        <div class="hbtn-icon hbi-adm">🔒</div>
+        <div class="hbtn-text"><div class="hbtn-title">Admin / நிர்வாகி</div><div class="hbtn-desc">Manage payments, members & settings</div></div>
+        <span style="opacity:.5;font-size:20px;">›</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- LOCK -->
+<div class="page" id="pg-lock">
+  <div class="lock-wrap">
+    <div class="lock-logo">🔒</div>
+    <div class="lock-title">Admin Login</div>
+    <div class="lock-sub">நிர்வாகி உள்நுழைவு</div>
+    <div class="lock-card">
+      <div class="lock-lbl">PASSWORD / கடவுச்சொல்</div>
+      <input type="password" class="lock-inp" id="pw-inp" placeholder="••••••" maxlength="20" onkeydown="if(event.key==='Enter')tryLogin()">
+      <button class="lock-btn" onclick="tryLogin()">🔓 Login / உள்நுழை</button>
+      <div class="lock-err" id="lock-err"></div>
+    </div>
+    <button class="lock-back" onclick="goHome()">← Back to Home</button>
+  </div>
+</div>
+
+<!-- PUBLIC -->
+<div class="page" id="pg-pub">
+  <div class="app-hdr">
+    <div class="app-hdr-top">
+      <button class="back-btn" onclick="goHome()">←</button>
+      <div class="app-logo">🏛️</div>
+      <div class="app-hdr-info">
+        <div class="app-hdr-title" id="pub-title">KMBSC Savings சீட்டு</div>
+        <div class="app-hdr-sub">Public View / பொது</div>
+      </div>
+      <div class="app-live"><span class="ldot"></span>Live</div>
+    </div>
+    <div class="app-hdr-stats">
+      <div class="astat">📅 <b id="p-mo">11</b> Months</div>
+      <div class="astat">👥 <b id="p-mem">—</b> Members</div>
+      <div class="astat">💰 <b id="p-amt">₹1,00,000</b>/mo</div>
+    </div>
+  </div>
+  <div class="sync-bar">
+    <div class="sync-left"><div class="sdot" id="sd-p"></div><span class="sync-lbl" id="sl-p">Connecting…</span></div>
+    <span class="sync-time" id="st-p"></span>
+    <button class="sync-refresh" onclick="manualSync()">🔄 Sync</button>
+  </div>
+  <div class="grp-tabs" id="pub-grp"></div>
+  <div class="pub-body">
+    <div class="sum-grid" id="pub-sum"></div>
+    <div class="sub-tabs">
+      <button class="stab active" onclick="switchPT('mem')" id="pt-mem"><span class="si">👤</span><span class="sl">Members</span><span class="st">உறுப்பினர்</span></button>
+      <button class="stab" onclick="switchPT('mw')" id="pt-mw"><span class="si">📅</span><span class="sl">Month-wise</span><span class="st">மாதவாரி</span></button>
+      <button class="stab" onclick="switchPT('prz')" id="pt-prz"><span class="si">🏆</span><span class="sl">Prize List</span><span class="st">பரிசு</span></button>
+    </div>
+    <div id="pub-mem-view" class="mem-cards"></div>
+    <div id="pub-mw-view" class="mw-wrap" style="display:none"></div>
+    <div id="pub-prz-view" class="prize-pub-list" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="page" id="pg-adm">
+  <div class="app-hdr">
+    <div class="app-hdr-top">
+      <button class="back-btn" onclick="goHome()">←</button>
+      <div class="app-logo">🏛️</div>
+      <div class="app-hdr-info">
+        <div class="app-hdr-title" id="adm-title">KMBSC Savings சீட்டு</div>
+        <div class="app-hdr-sub">Admin / நிர்வாகி</div>
+      </div>
+      <div class="app-live"><span class="ldot"></span>Live</div>
+    </div>
+    <div class="app-hdr-stats">
+      <div class="astat">📅 <b id="a-mo">11</b> Months</div>
+      <div class="astat">👥 <b id="a-mem">—</b> Members</div>
+      <div class="astat">💰 <b id="a-amt">₹1,00,000</b>/mo</div>
+    </div>
+  </div>
+  <div class="sync-bar">
+    <div class="sync-left"><div class="sdot" id="sd-a"></div><span class="sync-lbl" id="sl-a">Connecting…</span></div>
+    <span class="sync-time" id="st-a"></span>
+    <button class="sync-refresh" onclick="manualSync()">🔄 Sync</button>
+  </div>
+  <div class="grp-tabs" id="adm-grp"></div>
+  <div class="adm-body">
+    <div class="sec-ttl">⚙️ Admin — <span id="adm-grp-lbl">Group 1</span></div>
+    <div class="adm-tabs">
+      <button class="atab active" onclick="switchAT('pay')" id="at-pay"><span class="ai">💳</span><span class="al">Payments</span><span class="at2">கட்டணம்</span></button>
+      <button class="atab" onclick="switchAT('prz')" id="at-prz"><span class="ai">🏆</span><span class="al">Prize</span><span class="at2">பரிசு</span></button>
+      <button class="atab" onclick="switchAT('mem')" id="at-mem"><span class="ai">👥</span><span class="al">Members</span><span class="at2">உறுப்பினர்</span></button>
+      <button class="atab" onclick="switchAT('cfg')" id="at-cfg"><span class="ai">⚙️</span><span class="al">Settings</span><span class="at2">அமைவு</span></button>
+    </div>
+    <div id="sub-pay">
+      <div class="mo-wrap"><div class="mo-grid" id="mo-grid"></div></div>
+      <div class="pay-bar">
+        <div class="pay-bar-row"><span class="pb-lbl" id="pb-lbl">Month 1</span><span style="font-size:13px;font-weight:700;" id="pb-cnt">0/0</span></div>
+        <div class="pay-bar-row" style="margin-top:5px;"><span style="font-size:11px;color:var(--muted);">⏰ Last Date:</span><span style="font-size:12px;font-weight:700;color:var(--red);" id="pb-last">—</span></div>
+        <div class="prog"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+        <button class="btn-wa-bulk" onclick="whatsappBulkPending()">
+          <svg style="width:14px;height:14px;fill:#fff;flex-shrink:0;" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          📢 Bulk Pending Reminder
+        </button>
+      </div>
+      <div class="pay-cards" id="pay-cards"></div>
+      <button class="save-btn" onclick="saveAll()">🔥 Save & Sync to Firebase</button>
+    </div>
+    <div id="sub-prz" style="display:none"><div class="prz-adm" id="prz-adm-list"></div></div>
+    <div id="sub-mem" style="display:none"><div class="mem-adm" id="mem-adm-list"></div></div>
+    <div id="sub-cfg" style="display:none">
+      <div class="cfg-wrap">
+        <div class="cfg-card">
+          <div class="cfg-title">🏛️ Organisation</div>
+          <div class="cfg-field"><label>Name</label><input type="text" id="s-name"></div>
+          <div class="cfg-field"><label>Sub Title</label><input type="text" id="s-sub"></div>
+
+          <button class="cfg-btn" onclick="saveOrg()">💾 Save</button>
+        </div>
+        <div class="cfg-card">
+          <div class="cfg-title">👥 Groups</div>
+          <div id="grp-cfg-list"></div>
+          <button class="add-grp-btn" onclick="addGroup()">➕ Add Group</button>
+        </div>
+
+        <div class="cfg-card">
+          <div class="cfg-title">🔑 Change Admin Password</div>
+          <div class="cfg-field"><label>Current</label><input type="password" id="s-pw-old"></div>
+          <div class="cfg-field"><label>New</label><input type="password" id="s-pw-new"></div>
+          <div class="cfg-field"><label>Confirm</label><input type="password" id="s-pw-cf"></div>
+          <button class="cfg-btn" onclick="changePW()">🔒 Update</button>
+        </div>
+        <button class="logout-btn" onclick="logout()">🚪 Logout / வெளியேறு</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-ov hide" id="modal-ov" onclick="closeModalOut(event)">
+  <div class="modal-box">
+    <div class="modal-hdr"><span class="modal-ttl" id="modal-ttl">Edit</span><button class="modal-cls" onclick="closeModal()">✕</button></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════
+// FIREBASE CONFIG
+// ══════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyBVGVu59jDZybPFAX_pRisSrQRoXHQ0EWY",
+  authDomain: "kmbsc-chit.firebaseapp.com",
+  databaseURL: "https://kmbsc-chit-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "kmbsc-chit",
+  storageBucket: "kmbsc-chit.firebasestorage.app",
+  messagingSenderId: "511325458985",
+  appId: "1:511325458985:web:a7597bcf0f89b71405c238"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const DB_REF = db.ref('kmbsc');
+
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+let DB = {
+  password:'kmbsc123',
+  org:{name:'KMBSC Savings சீட்டு',sub:'Kovil Mutual Benefit Savings Chit'},
+  groups:[
+    {name:'Group 1',startMonth:0,startYear:2026,months:11,amount:100000,password:'group1'},
+    {name:'Group 2',startMonth:0,startYear:2026,months:11,amount:100000,password:'group2'}
+  ],
+  members:{},payments:{},prizes:{}
+};
+const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+// Monthly instalment chart — M1 to M11
+const MONTH_AMT = [10000, 7500, 7600, 7700, 7800, 8000, 8200, 8400, 8500, 9300, 10000];
+function monthAmt(m){ return MONTH_AMT[m-1] || MONTH_AMT[MONTH_AMT.length-1]; }
+function grpCfg(gi){
+  const g = (DB.groups||[])[gi!=null?gi:CG];
+  if(!g) return {name:'Group',startMonth:0,startYear:2026,months:11,amount:100000,password:''};
+  if(typeof g === 'string') return {name:g,startMonth:0,startYear:2026,months:11,amount:100000,password:''};
+  return g;
+}
+function mName(m,gi){ const c=grpCfg(gi!=null?gi:CG); return MONTH_NAMES[(c.startMonth + m - 1) % 12]; }
+function mLabel(m,gi){ return 'M'+m+' '+mName(m,gi!=null?gi:CG); }
+let CG=0, CM=1, CPT='mem', CAT='pay', lastSync=null;
+let unlockedGroups = {};
+
+// ══════════════════════════════════════
+// NORMALIZE
+// ══════════════════════════════════════
+function normalizeDB(data) {
+  if (!data) return;
+  if (!data.org) data.org = {name:'KMBSC Savings சீட்டு',sub:'Kovil Mutual Benefit Savings Chit'};
+  // Migrate old groups array of strings to objects
+  if (!data.groups || !Array.isArray(data.groups)) {
+    if (typeof data.groups === 'object') {
+      data.groups = Object.values(data.groups);
+    } else {
+      data.groups = [];
+    }
+  }
+  // Migrate legacy groupPasswords into group objects
+  const legacyPws = data.groupPasswords || [];
+  // Migrate legacy org.months / org.amount into per-group if needed
+  const legacyMonths = (data.org && data.org.months) || 11;
+  const legacyAmount = (data.org && data.org.amount) || 100000;
+  data.groups = data.groups.map((g, i) => {
+    if (typeof g === 'string') {
+      return {name:g, startMonth:0, startYear:2026, months:legacyMonths, amount:legacyAmount, password: legacyPws[i]||('group'+(i+1))};
+    }
+    if (!g.months) g.months = legacyMonths;
+    if (!g.amount) g.amount = legacyAmount;
+    if (!g.password && legacyPws[i]) g.password = legacyPws[i];
+    if (g.startMonth == null) g.startMonth = 0;
+    if (!g.startYear) g.startYear = 2026;
+    return g;
+  });
+  if (data.groups.length === 0) {
+    data.groups = [
+      {name:'Group 1',startMonth:0,startYear:2026,months:11,amount:100000,password:'group1'},
+      {name:'Group 2',startMonth:0,startYear:2026,months:11,amount:100000,password:'group2'}
+    ];
+  }
+  delete data.groupPasswords;
+  ['members','payments','prizes'].forEach(key => {
+    if (!data[key]) { data[key] = {}; return; }
+    if (Array.isArray(data[key])) {
+      const obj = {};
+      data[key].forEach((v,i) => { if(v !== null && v !== undefined) obj[i] = v; });
+      data[key] = obj;
+    }
+    data.groups.forEach((_,gi) => {
+      if (data[key][gi] === undefined || data[key][gi] === null) data[key][gi] = {};
+    });
+  });
+  data.groups.forEach((g,gi) => {
+    const gm = g.months || 11;
+    if (!data.payments[gi]) data.payments[gi] = {};
+    if (Array.isArray(data.payments[gi])) {
+      const obj = {};
+      data.payments[gi].forEach((v,i) => { if(v !== null && v !== undefined) obj[i] = v; });
+      data.payments[gi] = obj;
+    }
+    for (let m = 1; m <= gm; m++) {
+      if (!data.payments[gi][m]) data.payments[gi][m] = {};
+      if (Array.isArray(data.payments[gi][m])) {
+        const obj = {};
+        data.payments[gi][m].forEach((v,i) => { if(v !== null && v !== undefined) obj[i] = v; });
+        data.payments[gi][m] = obj;
+      }
+    }
+    if (!data.prizes[gi]) data.prizes[gi] = {};
+    if (Array.isArray(data.prizes[gi])) {
+      const obj = {};
+      data.prizes[gi].forEach((v,i) => { if(v !== null && v !== undefined) obj[i] = v; });
+      data.prizes[gi] = obj;
+    }
+    if (!data.prizes[gi][1] || !data.prizes[gi][1].winner) data.prizes[gi][1] = {winner:'கோவில்', amount:String(g.amount||100000), bid:String(g.amount||100000)};
+    if (!data.members[gi]) data.members[gi] = {};
+    if (Array.isArray(data.members[gi])) {
+      const obj = {};
+      data.members[gi].forEach((v,i) => { if(v !== null && v !== undefined) obj[i] = v; });
+      data.members[gi] = obj;
+    }
+  });
+}
+
+function todayStr(){
+  const d = new Date();
+  return d.getDate().toString().padStart(2,'0')+'/'+(d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getFullYear();
+}
+function toInputDate(ddmmyyyy){
+  if(!ddmmyyyy) return '';
+  const parts = ddmmyyyy.split('/');
+  if(parts.length !== 3) return '';
+  return parts[2]+'-'+parts[1].padStart(2,'0')+'-'+parts[0].padStart(2,'0');
+}
+function fromInputDate(yyyymmdd){
+  if(!yyyymmdd) return todayStr();
+  const parts = yyyymmdd.split('-');
+  if(parts.length !== 3) return todayStr();
+  return parts[2]+'/'+parts[1]+'/'+parts[0];
+}
+
+function ensureGroup(gi){
+  if (!DB.members) DB.members = {};
+  if (!DB.payments) DB.payments = {};
+  if (!DB.prizes) DB.prizes = {};
+  if (!DB.members[gi]) DB.members[gi] = {};
+  if (!DB.payments[gi]) DB.payments[gi] = {};
+  if (!DB.prizes[gi]) DB.prizes[gi] = {};
+  const gc = grpCfg(gi);
+  for(let m = 1; m <= gc.months; m++){
+    if (!DB.payments[gi][m]) DB.payments[gi][m] = {};
+    if (!DB.prizes[gi][m]) DB.prizes[gi][m] = {winner:'',amount:'',bid:''};
+    if (m===1 && (!DB.prizes[gi][1] || !DB.prizes[gi][1].winner))
+      DB.prizes[gi][1] = {winner:'கோவில்', amount:String(gc.amount), bid:String(gc.amount)};
+    Object.keys(DB.members[gi]).forEach(mid => {
+      if (!DB.payments[gi][m][mid])
+        DB.payments[gi][m][mid] = {date:todayStr(), amount:monthAmt(m), paid:false};
+    });
+  }
+}
+
+function buildDefault(){
+  DB.members = {}; DB.payments = {}; DB.prizes = {};
+  (DB.groups || ['Group 1','Group 2']).forEach((_,g) => {
+    DB.members[g] = {}; DB.payments[g] = {}; DB.prizes[g] = {};
+  });
+}
+
+// ══════════════════════════════════════
+// SYNC UI
+// ══════════════════════════════════════
+function setSyncUI(s, msg){
+  ['p','a'].forEach(id => {
+    const dot = document.getElementById('sd-'+id);
+    const lbl = document.getElementById('sl-'+id);
+    if(!dot||!lbl) return;
+    dot.className = 'sdot '+s;
+    lbl.className = 'sync-lbl'+(s==='ok'?' ok':s==='err'?' err':'');
+    lbl.textContent = msg;
+    if(s==='ok' && lastSync){
+      const t = document.getElementById('st-'+id);
+      if(t) t.textContent = lastSync.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    }
+  });
+}
+
+function pushDB(){
+  // Clean empty members before saving
+  if(DB.members){
+    Object.keys(DB.members).forEach(gi => {
+      if(DB.members[gi]){
+        Object.keys(DB.members[gi]).forEach(mid => {
+          if(!DB.members[gi][mid] || !DB.members[gi][mid].name){
+            delete DB.members[gi][mid];
+          }
+        });
+      }
+    });
+  }
+  setSyncUI('busy','Saving…');
+  const toSave = JSON.parse(JSON.stringify(DB));
+  DB_REF.set(toSave).then(() => {
+    lastSync = new Date();
+    setSyncUI('ok','Saved ✓ 🔥');
+    showToast('🔥 Saved! All devices updated!');
+  }).catch(e => {
+    setSyncUI('err','Save failed ⚠');
+    showToast('❌ Save failed: '+e.message, true);
+  });
+}
+
+function manualSync(){
+  setSyncUI('busy','Syncing…');
+  DB_REF.get().then(snap => {
+    const data = snap.val();
+    if(data){
+      normalizeDB(data);
+      DB = data;
+      lastSync = new Date();
+      setSyncUI('ok','Synced ✓');
+      renderCurrent();
+      showToast('🔄 Synced!');
+    } else {
+      setSyncUI('ok','No data');
+    }
+  }).catch(() => setSyncUI('err','Sync failed'));
+}
+
+function startLiveSync(){
+  DB_REF.on('value', snap => {
+    const data = snap.val();
+    if(data){
+      normalizeDB(data);
+      DB = data;
+    } else {
+      buildDefault();
+    }
+    lastSync = new Date();
+    setSyncUI('ok','Live 🔥');
+    updateHomeStats();
+    renderCurrent();
+  }, err => {
+    document.getElementById('spin-txt').textContent = 'Error: '+err.message;
+    setSyncUI('err','Failed');
+    setTimeout(() => {
+        buildDefault();
+      updateHomeStats();
+    }, 2000);
+  });
+}
+
+// ══════════════════════════════════════
+// PAGES
+// ══════════════════════════════════════
+function showPage(id){ document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id===id)); }
+function goHome(){ showPage('pg-home'); updateHomeStats(); }
+function goPub(){
+  const wasOnPub = document.getElementById('pg-pub').classList.contains('active');
+  showPage('pg-pub');
+  if(!wasOnPub){
+    // Fresh entry — reset locks
+    unlockedGroups = {};
+    CG = 0;
+    CPT = 'mem';
+    setTimeout(() => openGroupLock(0, () => { CM=1; renderPub(); }), 300);
+  }
+  renderPub();
+}
+function goAdm(){ showPage('pg-adm'); CAT='pay'; ensureGroup(CG); renderAdm(); }
+function goLock(){ showPage('pg-lock'); document.getElementById('pw-inp').value=''; document.getElementById('lock-err').textContent=''; }
+function logout(){ goHome(); }
+
+function tryLogin(){
+  const pw = document.getElementById('pw-inp').value;
+  if(pw === DB.password){ goAdm(); }
+  else {
+    const inp = document.getElementById('pw-inp');
+    inp.classList.add('shake');
+    document.getElementById('lock-err').textContent = '❌ Wrong password!';
+    setTimeout(() => inp.classList.remove('shake'), 400);
+    inp.value = '';
+  }
+}
+
+// ══════════════════════════════════════
+// STATS
+// ══════════════════════════════════════
+function updateHomeStats(){
+  document.getElementById('h-months').textContent = (DB.groups||[]).length;
+  let t = 0;
+  Object.values(DB.members||{}).forEach(g => t += Object.values(g||{}).filter(m=>m&&m.name).length);
+  document.getElementById('h-members').textContent = t || '—';
+  const a = monthAmt(CM)||10000;
+  document.getElementById('h-amt').textContent = a>=100000 ? '₹'+(a/100000).toFixed(1).replace('.0','')+'L' : '₹'+(a/1000).toFixed(0)+'K';
+}
+
+function updatePubStats(){
+  document.getElementById('pub-title').textContent = DB.org.name;
+  const gc = grpCfg(CG);
+  document.getElementById('p-mo').textContent = gc.months;
+  document.getElementById('p-mem').textContent = Object.values(DB.members[CG]||{}).filter(m=>m&&m.name).length;
+  document.getElementById('p-amt').textContent = '₹'+monthAmt(CM).toLocaleString('en-IN');
+}
+
+function updateAdmStats(){
+  document.getElementById('adm-title').textContent = DB.org.name;
+  const gc = grpCfg(CG);
+  document.getElementById('a-mo').textContent = gc.months;
+  document.getElementById('a-mem').textContent = Object.values(DB.members[CG]||{}).filter(m=>m&&m.name).length;
+  document.getElementById('a-amt').textContent = '₹'+monthAmt(CM).toLocaleString('en-IN');
+}
+
+function renderGrpTabs(elId, cb){
+  const el = document.getElementById(elId); if(!el) return;
+  el.innerHTML = '';
+  const isPublic = elId === 'pub-grp';
+  (DB.groups||[]).forEach((g,i) => {
+    const gname = typeof g === 'string' ? g : g.name;
+    const b = document.createElement('button');
+    b.className = 'grp-tab'+(i===CG?' active':'');
+    const locked = isPublic && !unlockedGroups[i];
+    b.innerHTML = locked ? gname+' 🔒' : gname;
+    b.onclick = () => {
+      if(isPublic && !unlockedGroups[i]){
+        openGroupLock(i, cb);
+      } else {
+        CG=i; CM=1; ensureGroup(i); cb();
+      }
+    };
+    el.appendChild(b);
+  });
+}
+
+function renderCurrent(){
+  const pg = document.querySelector('.page.active'); if(!pg) return;
+  if(pg.id==='pg-pub') renderPub();
+  else if(pg.id==='pg-adm') renderAdm();
+  else updateHomeStats();
+}
+
+// ══════════════════════════════════════
+// PUBLIC
+// ══════════════════════════════════════
+function renderPub(){
+  updatePubStats();
+  renderGrpTabs('pub-grp', () => { CM=1; renderPub(); });
+
+  if(!unlockedGroups[CG]){
+    document.getElementById('pub-sum').innerHTML = '';
+    document.getElementById('pub-mem-view').innerHTML = `
+      <div class="empty-state" style="padding:40px 20px;">
+        <div class="ei">🔒</div>
+        <div class="et" style="margin-bottom:8px;">${grpCfg(CG).name}</div>
+        <div class="es">இந்த group-ஐ பார்க்க<br>மேலே உள்ள group button-ஐ click பண்ணவும்</div>
+      </div>`;
+    ['mw','prz'].forEach(x => {
+      const v = document.getElementById('pub-'+x+'-view');
+      if(v){ v.innerHTML=''; v.style.display='none'; }
+    });
+    document.getElementById('pub-mem-view').style.display = '';
+    ['mem','mw','prz'].forEach(x => {
+      const tb = document.getElementById('pt-'+x);
+      if(tb) tb.classList.toggle('active', x==='mem');
+    });
+    return;
+  }
+
+  renderPubSummary();
+  if(CPT==='mem') renderPubMembers();
+  else if(CPT==='mw') renderPubMW();
+  else renderPubPrize();
+  ['mem','mw','prz'].forEach(x => {
+    const v = document.getElementById('pub-'+x+'-view');
+    if(v) v.style.display = x===CPT ? '' : 'none';
+    const tb = document.getElementById('pt-'+x);
+    if(tb) tb.classList.toggle('active', x===CPT);
+  });
+}
+
+function togglePubDetail(id){
+  const el = document.getElementById(id);
+  if(el) el.style.display = el.style.display==='none' ? 'block' : 'none';
+}
+
+function switchPT(t){
+  if(!unlockedGroups[CG]){
+    openGroupLock(CG, () => { CM=1; renderPub(); });
+    return;
+  }
+  CPT = t;
+  ['mem','mw','prz'].forEach(x => {
+    document.getElementById('pt-'+x).classList.toggle('active', x===t);
+    const v = document.getElementById('pub-'+x+'-view');
+    if(v) v.style.display = x===t ? '' : 'none';
+  });
+  if(t==='mem') renderPubMembers();
+  else if(t==='mw') renderPubMW();
+  else renderPubPrize();
+}
+
+function renderPubSummary(){
+  ensureGroup(CG);
+  const mids = Object.keys(DB.members[CG]||{}).filter(mid => DB.members[CG][mid] && DB.members[CG][mid].name);
+  mids.forEach(mid => {
+    for(let m=1; m<=grpCfg(CG).months; m++){
+      const p = DB.payments[CG] && DB.payments[CG][m] && DB.payments[CG][m][mid];
+      if(p && p.paid) total += Number(p.amount)||0;
+    }
+  });
+  let prizes = 0;
+  for(let m=1; m<=grpCfg(CG).months; m++){
+    if(DB.prizes[CG] && DB.prizes[CG][m] && DB.prizes[CG][m].winner) prizes++;
+  }
+  document.getElementById('pub-sum').innerHTML=`
+    <div class="sum-card"><div class="sc-icon">💰</div><div class="sc-val">₹${(total/1000).toFixed(0)}K</div><div class="sc-lbl">Total Collected<br>சேர்த்தது</div></div>
+    <div class="sum-card"><div class="sc-icon">🏆</div><div class="sc-val">${prizes}/${grpCfg(CG).months}</div><div class="sc-lbl">Prizes Given<br>பரிசு</div></div>
+    <div class="sum-card"><div class="sc-icon">📊</div><div class="sc-val">${grpCfg(CG).name}</div><div class="sc-lbl">Current Group<br>குழு</div></div>`;
+}
+
+function renderPubMembers(){
+  ensureGroup(CG);
+  const el = document.getElementById('pub-mem-view'); el.innerHTML = '';
+  const mids = Object.keys(DB.members[CG]||{}).filter(mid => DB.members[CG][mid] && DB.members[CG][mid].name);
+  if(!mids.length){
+    el.innerHTML='<div class="empty-state"><div class="ei">👥</div><div class="et">உறுப்பினர்கள் இல்லை</div><div class="es">No members added yet.<br>Admin → Members-ல் add பண்ணவும்.</div></div>';
+    return;
+  }
+  let num = 0;
+  mids.forEach((mid) => {
+    const mem = DB.members[CG][mid];
+    if(!mem) return;
+    num++;
+    let pc=0, tot=0;
+    for(let m=1; m<=grpCfg(CG).months; m++){
+      const p = DB.payments[CG] && DB.payments[CG][m] && DB.payments[CG][m][mid];
+      if(p && p.paid){ pc++; tot += Number(p.amount)||0; }
+    }
+    const allP = pc===grpCfg(CG).months, hasP = pc>0;
+    let dots = '';
+    for(let m=1; m<=grpCfg(CG).months; m++){
+      const paid = DB.payments[CG] && DB.payments[CG][m] && DB.payments[CG][m][mid] && DB.payments[CG][m][mid].paid;
+      dots += `<div class="mdot2${paid?' paid':''}">${m}</div>`;
+    }
+    let detailRows = '';
+    for(let m=1; m<=grpCfg(CG).months; m++){
+      const p = DB.payments[CG] && DB.payments[CG][m] && DB.payments[CG][m][mid];
+      if(p && p.paid){
+        detailRows += `<div class="pd-row pd-paid"><span class="pd-mo">${mLabel(m)}</span><span class="pd-date">${p.date||'—'}</span><span class="pd-amt">₹${Number(p.amount).toLocaleString('en-IN')} ✓</span></div>`;
+      } else {
+        detailRows += `<div class="pd-row pd-pend"><span class="pd-mo">${mLabel(m)}</span><span class="pd-date">—</span><span class="pd-amt" style="color:var(--red)">Pending</span></div>`;
+      }
+    }
+    const cardNum = num;
+    const card = document.createElement('div');
+    card.className = 'mpc'+(allP?' ap':hasP?' hp':'');
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', function(){ 
+      const det = document.getElementById('pd-'+cardNum);
+      if(det) det.style.display = det.style.display==='none'?'block':'none';
+    });
+    card.innerHTML=`
+      <div class="mpc-top">
+        <div class="mpc-num${allP?' ap':''}">${num}</div>
+        <div class="mpc-info">
+          <div class="mpc-name">${mem.name||'—'}</div>
+          <div class="mpc-sub">${pc}/${grpCfg(CG).months} months • ${Math.round(pc/grpCfg(CG).months*100)}% paid</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
+          <div class="mpc-total${allP?' full':''}">₹${tot.toLocaleString('en-IN')}</div>
+          <div style="font-size:10px;color:var(--muted);">▾ தகவல்</div>
+        </div>
+      </div>
+      <div class="month-dots">${dots}</div>
+      <div id="pd-${num}" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:8px;">
+        <div style="display:grid;grid-template-columns:1fr 2fr 2fr;gap:4px;font-size:10px;color:var(--muted);font-weight:600;margin-bottom:6px;padding:0 2px;">
+          <span>Month</span><span>Date</span><span>Amount</span>
+        </div>
+        ${detailRows}
+      </div>`;
+    el.appendChild(card);
+  });
+}
+
+function renderPubMW(){
+  updatePubStats();
+  ensureGroup(CG);
+  const el = document.getElementById('pub-mw-view'); el.innerHTML = '';
+  const mids = Object.keys(DB.members[CG]||{}).filter(mid => DB.members[CG][mid] && DB.members[CG][mid].name);
+  let sel = '<div class="mw-sel">';
+  for(let m=1; m<=grpCfg(CG).months; m++){
+    const pc = mids.filter(mid => DB.payments[CG] && DB.payments[CG][m] && DB.payments[CG][m][mid] && DB.payments[CG][m][mid].paid).length;
+    const allP = mids.length > 0 && pc === mids.length;
+    sel += `<button class="mwbtn${m===CM?' active':''}${allP&&m!==CM?' allp':''}" onclick="CM=${m};renderPubMW()">${mLabel(m)}${allP&&m!==CM?'<span class="mtick">✓</span>':''}</button>`;
+  }
+  sel += '</div>';
+  const pc = mids.filter(mid => DB.payments[CG] && DB.payments[CG][CM] && DB.payments[CG][CM][mid] && DB.payments[CG][CM][mid].paid).length;
+  let list = `<div class="mw-summary"><span class="mws-lbl">${mLabel(CM)}</span><span style="font-size:13px;font-weight:700;color:${pc===mids.length&&mids.length?'var(--green)':'var(--text)'}">${pc}/${mids.length} paid</span></div><div class="mw-list">`;
+  if(!mids.length){
+    list += '<div class="empty-state"><div class="ei">📅</div><div class="et">No members yet</div></div>';
+  } else {
+    let mwNum = 0;
+    mids.forEach((mid) => {
+      const mem = DB.members[CG][mid];
+      if(!mem) return;
+      mwNum++;
+      const p = (DB.payments[CG] && DB.payments[CG][CM] && DB.payments[CG][CM][mid]) || {paid:false, amount:monthAmt(CM)};
+      list += `<div class="mw-row${p.paid?' paid':''}">
+        <div class="mwnum${p.paid?' p':''}">${mwNum}</div>
+        <div class="mw-name">${mem.name||'—'}</div>
+        ${p.paid ? `<div class="mw-amt">₹${Number(p.amount).toLocaleString('en-IN')} ✓</div>` : `<div class="mw-pend">Pending</div>`}
+      </div>`;
+    });
+  }
+  list += '</div>';
+  el.innerHTML = sel+list;
+}
+
+function renderPubPrize(){
+  ensureGroup(CG);
+  const el = document.getElementById('pub-prz-view'); el.innerHTML = '';
+  for(let m=1; m<=grpCfg(CG).months; m++){
+    const pr = (DB.prizes[CG] && DB.prizes[CG][m]) || {winner:'',amount:'',bid:''};
+    const card = document.createElement('div');
+    card.className = 'ppc'+(pr.winner?' won':'');
+    card.innerHTML=`
+      <div class="ppc-mo"><div class="ppc-mn">M${m}</div><div class="ppc-ml">${mName(m)}</div></div>
+      <div class="ppc-info">
+        <div class="ppc-winner${pr.winner?'':' empty'}">${pr.winner||'Not decided yet'}</div>
+        ${pr.bid?`<div class="ppc-bid">Bid: ₹${Number(pr.bid).toLocaleString('en-IN')}</div>`:''}
+      </div>
+      ${pr.amount?`<div class="ppc-amt">₹${Number(pr.amount).toLocaleString('en-IN')}</div>`:''}`;
+    el.appendChild(card);
+  }
+}
+
+// ══════════════════════════════════════
+// ADMIN
+// ══════════════════════════════════════
+function renderAdm(){
+  updateAdmStats();
+  renderGrpTabs('adm-grp', () => { CM=1; ensureGroup(CG); document.getElementById('adm-grp-lbl').textContent=grpCfg(CG).name; renderAdm(); });
+  document.getElementById('adm-grp-lbl').textContent = grpCfg(CG).name;
+  ['pay','prz','mem','cfg'].forEach(x => {
+    const el = document.getElementById('sub-'+x);
+    if(el) el.style.display = x===CAT ? 'block' : 'none';
+    const tb = document.getElementById('at-'+x);
+    if(tb) tb.classList.toggle('active', x===CAT);
+  });
+  if(CAT==='pay') renderPayments();
+  else if(CAT==='prz') renderPrizeAdm();
+  else if(CAT==='mem') renderMemAdm();
+  else renderCfg();
+}
+
+function switchAT(t){
+  CAT = t;
+  ['pay','prz','mem','cfg'].forEach(x => {
+    document.getElementById('at-'+x).classList.toggle('active', x===t);
+    document.getElementById('sub-'+x).style.display = x===t ? 'block' : 'none';
+  });
+  if(t==='pay') renderPayments();
+  else if(t==='prz') renderPrizeAdm();
+  else if(t==='mem') renderMemAdm();
+  else renderCfg();
+}
+
+function renderMonthGrid(){
+  const el = document.getElementById('mo-grid'); if(!el) return;
+  el.innerHTML = '';
+  const mids = Object.keys(DB.members[CG]||{}).filter(mid => DB.members[CG][mid] && DB.members[CG][mid].name);
+  for(let m=1; m<=grpCfg(CG).months; m++){
+    const pc = mids.filter(mid => DB.payments[CG] && DB.payments[CG][m] && DB.payments[CG][m][mid] && DB.payments[CG][m][mid].paid).length;
+    const allP = mids.length > 0 && pc === mids.length;
+    const b = document.createElement('button');
+    b.className = 'mobtn'+(m===CM?' active':'')+(allP&&m!==CM?' allp':'');
+    b.innerHTML = mLabel(m)+(allP&&m!==CM?'<span class="mtk">✓</span>':'');
+    const mo = m; b.onclick = () => { CM=mo; renderPayments(); };
+    el.appendChild(b);
+  }
+}
+
+function renderPayments(){
+  ensureGroup(CG);
+  renderMonthGrid();
+  updateAdmStats();
+  const mids = Object.keys(DB.members[CG]||{}).filter(mid => DB.members[CG][mid] && DB.members[CG][mid].name);
+  const pc = mids.filter(mid => DB.payments[CG] && DB.payments[CG][CM] && DB.payments[CG][CM][mid] && DB.payments[CG][CM][mid].paid).length;
+  document.getElementById('pb-lbl').textContent = mLabel(CM)+' Payments';
+  document.getElementById('pb-cnt').textContent = pc+'/'+mids.length+' paid';
+  document.getElementById('prog-fill').style.width = (mids.length ? pc/mids.length*100 : 0)+'%';
+  // Last date: 19th of the current month
+  const gc = grpCfg(CG);
+  const lastMonIdx = (gc.startMonth + CM - 1) % 12;
+  const lastYear = gc.startYear + Math.floor((gc.startMonth + CM - 1) / 12);
+  const lastDateStr = '19 ' + MONTH_NAMES[lastMonIdx] + ' ' + lastYear;
+  document.getElementById('pb-last').textContent = lastDateStr;
+  const c = document.getElementById('pay-cards'); c.innerHTML = '';
+  if(!mids.length){
+    c.innerHTML='<div class="empty-state"><div class="ei">👥</div><div class="et">உறுப்பினர்கள் இல்லை</div><div class="es">Members tab-ல் add பண்ணவும்.</div></div>';
+    return;
+  }
+  let payNum = 0;
+  mids.forEach((mid) => {
+    const mem = DB.members[CG][mid];
+    if(!mem) return;
+    payNum++;
+    if(!DB.payments[CG][CM]) DB.payments[CG][CM] = {};
+    if(!DB.payments[CG][CM][mid]) DB.payments[CG][CM][mid] = {date:todayStr(), amount:monthAmt(CM), paid:false};
+    const p = DB.payments[CG][CM][mid];
+    // Unpaid-ஆ இருந்தா correct month amount set பண்ணு
+    if(!p.paid) p.amount = monthAmt(CM);
+    const div = document.createElement('div');
+    div.className = 'pcard'+(p.paid?' pd':'');
+    div.innerHTML=`
+      <div class="pcard-hdr" onclick="toggleBody('pb-${mid}')">
+        <div class="pnum${p.paid?' p':''}">${payNum}</div>
+        <div class="pcard-name">${mem.name||'—'}</div>
+        <div>${p.paid?'✅':'⏳'}</div>
+      </div>
+      <div class="pcard-body" id="pb-${mid}" style="display:none">
+        <div class="mf"><label>Date / தேதி 📅</label>
+          <input type="date" id="d-${mid}" value="${toInputDate(p.date||todayStr())}" class="${p.paid?'pv':''}"></div>
+        <div class="mf"><label>Amount / தொகை</label>
+          <input type="number" inputmode="numeric" pattern="[0-9]*" id="a-${mid}" value="${p.amount||monthAmt(CM)}" class="${p.paid?'pv':''}"></div>
+        ${p.paid?`<div class="paid-strip">✅ Paid — ₹${Number(p.amount).toLocaleString('en-IN')}</div>`:''}
+        <div class="mf" style="grid-column:span 2">
+          <button class="act-btn ${p.paid?'btn-unpay':'btn-pay'}" onclick="togglePaid('${mid}')">
+            ${p.paid?'❌ Mark Unpaid':'✅ Mark as Paid'}</button>
+        </div>
+        ${!p.paid?`<div class="mf" style="grid-column:span 2">
+          <button class="btn-wa" onclick="whatsappReminder('${mid}')">
+            <svg class="wa-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            📱 WhatsApp Reminder
+          </button>
+        </div>`:''}
+      </div>`;
+    c.appendChild(div);
+  });
+}
+
+function toggleBody(id){
+  const b = document.getElementById(id);
+  if(b) b.style.display = b.style.display==='none' ? 'grid' : 'none';
+}
+
+function togglePaid(mid){
+  const dEl = document.getElementById('d-'+mid);
+  const aEl = document.getElementById('a-'+mid);
+  if(!DB.payments[CG][CM]) DB.payments[CG][CM] = {};
+  if(!DB.payments[CG][CM][mid]) DB.payments[CG][CM][mid] = {date:todayStr(), amount:monthAmt(CM), paid:false};
+  if(dEl) DB.payments[CG][CM][mid].date = fromInputDate(dEl.value);
+  if(aEl) DB.payments[CG][CM][mid].amount = Number(aEl.value)||monthAmt(CM);
+  DB.payments[CG][CM][mid].paid = !DB.payments[CG][CM][mid].paid;
+  pushDB(); renderPayments();
+}
+
+function saveAll(){
+  Object.keys(DB.members[CG]||{}).forEach(mid => {
+    const dEl = document.getElementById('d-'+mid);
+    const aEl = document.getElementById('a-'+mid);
+    if(!DB.payments[CG][CM]) DB.payments[CG][CM] = {};
+    if(!DB.payments[CG][CM][mid]) DB.payments[CG][CM][mid] = {date:todayStr(), amount:monthAmt(CM), paid:false};
+    if(dEl) DB.payments[CG][CM][mid].date = fromInputDate(dEl.value);
+    if(aEl) DB.payments[CG][CM][mid].amount = Number(aEl.value)||monthAmt(CM);
+  });
+  pushDB(); renderPayments();
+}
+
+function getLastDate(m){
+  const gc = grpCfg(CG);
+  const monIdx = (gc.startMonth + m - 1) % 12;
+  const yr = gc.startYear + Math.floor((gc.startMonth + m - 1) / 12);
+  return '19 ' + MONTH_NAMES[monIdx] + ' ' + yr;
+}
+
+function whatsappReminder(mid){
+  const mem = DB.members[CG][mid]; if(!mem) return;
+  const gc = grpCfg(CG);
+  const phone = (mem.phone||'').replace(/[^0-9]/g,'');
+  const grpName = gc.name;
+  const mo = mLabel(CM);
+  const amt = Number((DB.payments[CG][CM]&&DB.payments[CG][CM][mid]&&DB.payments[CG][CM][mid].amount)||monthAmt(CM)).toLocaleString('en-IN');
+  const lastDate = getLastDate(CM);
+  const msg = `வணக்கம் ${mem.name} அவர்களே,
+
+*${grpName} - ${mo}* மாத சீட்டு கட்டணம் இதுவரை செலுத்தவில்லை.
+
+தொகை: *₹${amt}*
+கடைசி தேதி: *${lastDate}*
+
+தயவுசெய்து கடைசி தேதிக்குள் செலுத்தவும்.
+
+நன்றி! 🙏
+*KMBSC*`;
+  const url = phone
+    ? 'https://wa.me/91'+phone+'?text='+encodeURIComponent(msg)
+    : 'https://wa.me/?text='+encodeURIComponent(msg);
+  window.open(url, '_blank');
+}
+
+function whatsappBulkPending(){
+  const gc = grpCfg(CG);
+  const mids = Object.keys(DB.members[CG]||{}).filter(mid => {
+    const m = DB.members[CG][mid];
+    if(!m||!m.name) return false;
+    const p = DB.payments[CG]&&DB.payments[CG][CM]&&DB.payments[CG][CM][mid];
+    return !p||!p.paid;
+  });
+  if(!mids.length){ showToast('✅ எல்லாரும் கட்டினார்!'); return; }
+  const mo = mLabel(CM);
+  const amt = monthAmt(CM).toLocaleString('en-IN');
+  const lastDate = getLastDate(CM);
+  const msg = `*${gc.name} - ${mo} பகுதி கட்டணம் வருமாறு*
+
+கீழ்கஂட உறுப்பினர் இன்னும் செலுத்தவில்லை:
+${mids.map((mid,i)=>(i+1)+'. '+DB.members[CG][mid].name).join('\n')}
+
+தொகை: *₹${amt}*
+கடைசி தேதி: *${lastDate}*
+
+தயவுசேய்து கடைசி தேதிக்குள் செலுத்தவும்.
+
+*KMBSC* 🙏`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg), '_blank');
+}
+
+function renderPrizeAdm(){
+  ensureGroup(CG);
+  const el = document.getElementById('prz-adm-list'); el.innerHTML = '';
+  const mids = Object.keys(DB.members[CG]||{});
+  for(let m=1; m<=grpCfg(CG).months; m++){
+    const pr = (DB.prizes[CG] && DB.prizes[CG][m]) || {winner:'',amount:'',bid:''};
+    const card = document.createElement('div'); card.className = 'prz-card';
+    card.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-size:14px;font-weight:700;color:var(--orange)">${mLabel(m)}</span>
+        ${pr.winner?`<span style="font-size:12px;color:var(--green)">🏆 ${pr.winner}</span>`:''}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+        <div><label class="pz-lbl">Winner</label>
+          <select id="pw-${m}">
+            <option value="">Select…</option>
+            ${mids.map(mid=>{const mem=DB.members[CG][mid];return mem?`<option value="${mem.name}"${pr.winner===mem.name?' selected':''}>${mem.name}</option>`:''}).join('')}
+          </select></div>
+        <div><label class="pz-lbl">Prize ₹</label>
+          <input type="number" inputmode="numeric" pattern="[0-9]*" id="pa-${m}" value="${pr.amount||''}" placeholder="0"></div>
+        <div><label class="pz-lbl">Bid ₹</label>
+          <input type="number" inputmode="numeric" pattern="[0-9]*" id="pb2-${m}" value="${pr.bid||''}" placeholder="0"></div>
+      </div>`;
+    el.appendChild(card);
+  }
+  const sb = document.createElement('button'); sb.className='save-btn';
+  sb.textContent = '🔥 Save Prize to Firebase';
+  sb.onclick = () => {
+    for(let m=1; m<=grpCfg(CG).months; m++){
+      if(!DB.prizes[CG]) DB.prizes[CG] = {};
+      const wSel = document.getElementById('pw-'+m);
+      const paEl = document.getElementById('pa-'+m);
+      const pbEl = document.getElementById('pb2-'+m);
+      DB.prizes[CG][m] = {
+        winner: wSel ? wSel.value : '',
+        amount: paEl ? paEl.value : '',
+        bid: pbEl ? pbEl.value : ''
+      };
+    }
+    pushDB(); showToast('🏆 Prize saved!');
+  };
+  el.appendChild(sb);
+}
+
+function renderMemAdm(){
+  ensureGroup(CG);
+  const el = document.getElementById('mem-adm-list');
+  if(!el){ console.warn('mem-adm-list not found'); return; }
+  el.innerHTML = '';
+  const mids = Object.keys(DB.members[CG]||{}).filter(mid => DB.members[CG][mid] && DB.members[CG][mid].name);
+  if(!mids.length){
+    el.innerHTML='<div class="empty-state"><div class="ei">👥</div><div class="et">உறுப்பினர்கள் இல்லை</div><div class="es">கீழே உள்ள button-ல் member add பண்ணவும்.</div></div>';
+  } else {
+    let num = 0;
+    mids.forEach((mid) => {
+      const mem = DB.members[CG][mid];
+      if(!mem) return;
+      num++;
+      const div = document.createElement('div'); div.className = 'memc';
+      div.innerHTML=`<div class="memc-row">
+        <div class="memc-av">${num}</div>
+        <div class="memc-info">
+          <div class="memc-name">${mem.name||'—'}</div>
+          <div class="memc-phone">📞 ${mem.phone||'—'}</div>
+        </div>
+        <div class="memc-acts">
+          <button class="medit" onclick="openEditMem('${mid}')">✏️ Edit</button>
+          <button class="mdel" onclick="openDelMem('${mid}')">🗑️</button>
+        </div></div>`;
+      el.appendChild(div);
+    });
+  }
+  const add = document.createElement('div');
+  add.innerHTML = `<button class="add-mem-btn" onclick="openAddMem()">➕ Add New Member / புதிய உறுப்பினர்</button>`;
+  el.appendChild(add);
+}
+
+function openAddMem(){
+  showModal('➕ Add Member',`
+    <div class="mfield"><label>Name / பெயர்</label><input type="text" id="mn" placeholder="Member Name" autofocus></div>
+    <div class="mfield"><label>Phone / தொலைபேசி</label><input type="tel" id="mp" placeholder="98765 43210"></div>
+    <div class="mbtns">
+      <button class="mb-cancel" onclick="closeModal()">Cancel</button>
+      <button class="mb-ok" onclick="confirmAddMem()">➕ Add</button>
+    </div>`);
+}
+
+function confirmAddMem(){
+  const name = document.getElementById('mn').value.trim();
+  const phone = document.getElementById('mp').value.trim();
+  if(!name){ showToast('❌ பெயர் தேவை!', true); return; }
+  const mid = 'm'+Date.now();
+  if(!DB.members[CG]) DB.members[CG] = {};
+  DB.members[CG][mid] = {name, phone};
+  ensureGroup(CG);
+  pushDB(); closeModal(); renderMemAdm();
+  updateAdmStats(); updateHomeStats();
+  showToast('✅ '+name+' added!');
+}
+
+function openEditMem(mid){
+  const m = DB.members[CG][mid];
+  if(!m) return;
+  showModal('✏️ Edit Member',`
+    <div class="mfield"><label>Name / பெயர்</label><input type="text" id="mn" value="${m.name||''}"></div>
+    <div class="mfield"><label>Phone / தொலைபேசி</label><input type="tel" id="mp" value="${m.phone||''}"></div>
+    <div class="mbtns">
+      <button class="mb-cancel" onclick="closeModal()">Cancel</button>
+      <button class="mb-ok" onclick="confirmEditMem('${mid}')">💾 Save</button>
+    </div>`);
+}
+
+function confirmEditMem(mid){
+  const name = document.getElementById('mn').value.trim();
+  const phone = document.getElementById('mp').value.trim();
+  if(!name){ showToast('❌ பெயர் தேவை!', true); return; }
+  DB.members[CG][mid] = {name, phone};
+  pushDB(); closeModal(); renderMemAdm();
+  showToast('✅ Updated!');
+}
+
+function openDelMem(mid){
+  const m = DB.members[CG][mid];
+  if(!m) return;
+  showModal('🗑️ Delete',`
+    <p style="color:var(--muted);font-size:13px;margin-bottom:8px;"><b style="color:var(--text)">${m.name}</b>-ஐ delete பண்ணவா?</p>
+    <p style="color:var(--red);font-size:12px;margin-bottom:16px;">⚠️ அனைத்து payment data-வும் அழிக்கப்படும்!</p>
+    <div class="mbtns">
+      <button class="mb-cancel" onclick="closeModal()">Cancel</button>
+      <button class="mb-ok" style="background:var(--red);color:#fff;" onclick="confirmDelMem('${mid}')">🗑️ Delete</button>
+    </div>`);
+}
+
+function confirmDelMem(mid){
+  delete DB.members[CG][mid];
+  for(let m=1; m<=grpCfg(CG).months; m++){
+    if(DB.payments[CG] && DB.payments[CG][m]) delete DB.payments[CG][m][mid];
+  }
+  pushDB(); closeModal(); renderMemAdm();
+  updateAdmStats(); updateHomeStats();
+  showToast('🗑️ Deleted!');
+}
+
+function renderCfg(){
+  document.getElementById('s-name').value = DB.org.name;
+  document.getElementById('s-sub').value = DB.org.sub||'';
+  const el = document.getElementById('grp-cfg-list'); el.innerHTML = '';
+  (DB.groups||[]).forEach((g,i) => {
+    const gc = grpCfg(i);
+    const mn = gc.startMonth||0;
+    const moOpts = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+      .map((mo,idx)=>`<option value="${idx}"${idx===mn?' selected':''}>${mo}</option>`).join('');
+    const row = document.createElement('div');
+    row.className = 'grp-cfg-card';
+    row.innerHTML = `
+      <div class="grp-cfg-hdr">
+        <span class="grp-cfg-num">${i+1}</span>
+        <input class="grp-cfg-name" type="text" value="${gc.name}" placeholder="Group Name" id="gcn-${i}">
+        ${DB.groups.length>1?`<button class="grp-del" onclick="confirmDeleteGroup(${i})">🗑️</button>`:''}
+      </div>
+      <div class="grp-cfg-fields">
+        <div class="gcf"><label>தொடக்க மாதம்</label>
+          <select id="gcm-${i}">${moOpts}</select></div>
+        <div class="gcf"><label>ஆண்டு</label>
+          <input type="number" id="gcy-${i}" value="${gc.startYear||2026}" min="2020" max="2040" inputmode="numeric"></div>
+        <div class="gcf"><label>மாதங்கள்</label>
+          <input type="number" id="gcmo-${i}" value="${gc.months||11}" min="1" max="36" inputmode="numeric"></div>
+        <div class="gcf"><label>தொகை ₹</label>
+          <input type="number" id="gca-${i}" value="${gc.amount||100000}" min="1000" inputmode="numeric"></div>
+        <div class="gcf gcf-full"><label>Password</label>
+          <input type="text" id="gcp-${i}" value="${gc.password||''}" placeholder="group password"></div>
+      </div>
+      <button class="gcf-save" onclick="saveGroupCfg(${i})">💾 Save ${gc.name}</button>`;
+    el.appendChild(row);
+  });
+}
+
+function saveGroupCfg(i){
+  const gc = grpCfg(i);
+  const name = (document.getElementById('gcn-'+i)||{}).value || gc.name;
+  const startMonth = parseInt((document.getElementById('gcm-'+i)||{}).value)||0;
+  const startYear = parseInt((document.getElementById('gcy-'+i)||{}).value)||2026;
+  const months = parseInt((document.getElementById('gcmo-'+i)||{}).value)||gc.months;
+  const amount = parseInt((document.getElementById('gca-'+i)||{}).value)||gc.amount;
+  const password = (document.getElementById('gcp-'+i)||{}).value || gc.password;
+  DB.groups[i] = {name, startMonth, startYear, months, amount, password};
+  ensureGroup(i);
+  renderGrpTabs('adm-grp', () => { ensureGroup(CG); renderAdm(); });
+  renderGrpTabs('pub-grp', () => { ensureGroup(CG); renderPub(); });
+  renderCfg(); pushDB(); showToast('✅ '+name+' saved!');
+}
+
+function saveOrg(){
+  DB.org = {
+    name: document.getElementById('s-name').value.trim()||DB.org.name,
+    sub: document.getElementById('s-sub').value.trim()||DB.org.sub||''
+  };
+  pushDB(); updateAdmStats(); updateHomeStats();
+  showToast('✅ Settings saved!');
+}
+
+function addGroup(){
+  const ni = DB.groups.length;
+  DB.groups.push({name:'Group '+(ni+1),startMonth:0,startYear:2026,months:11,amount:100000,password:'group'+(ni+1)});
+  DB.members[ni] = {}; DB.payments[ni] = {}; DB.prizes[ni] = {};
+  ensureGroup(ni);
+  renderGrpTabs('adm-grp', () => { ensureGroup(CG); renderAdm(); });
+  renderCfg(); pushDB(); showToast('✅ Group '+(ni+1)+' added!');
+}
+
+function confirmDeleteGroup(i){
+  const gc = grpCfg(i);
+  showModal('🗑️ Delete Group',`
+    <p style="color:var(--muted);font-size:13px;margin-bottom:8px;"><b style="color:var(--text)">${gc.name}</b>-ஐ delete பண்ணவா?</p>
+    <p style="color:var(--red);font-size:12px;margin-bottom:16px;">⚠️ இந்த group-இன் அனைத்து data-வும் அழிக்கப்படும்!</p>
+    <div class="mbtns">
+      <button class="mb-cancel" onclick="closeModal()">Cancel</button>
+      <button class="mb-ok" style="background:var(--red);color:#fff;" onclick="deleteGroup(${i})">🗑️ Delete</button>
+    </div>`);
+}
+
+function deleteGroup(i){
+  if(DB.groups.length <= 1){ showToast('❌ Last group delete பண்ண முடியாது!', true); return; }
+  DB.groups.splice(i, 1);
+  const nm={}, np={}, nz={};
+  DB.groups.forEach((_,ni) => {
+    const oi = ni>=i ? ni+1 : ni;
+    nm[ni] = DB.members[oi]||{};
+    np[ni] = DB.payments[oi]||{};
+    nz[ni] = DB.prizes[oi]||{};
+  });
+  DB.members=nm; DB.payments=np; DB.prizes=nz;
+  if(CG >= DB.groups.length) CG=0;
+  closeModal();
+  renderGrpTabs('adm-grp', () => { ensureGroup(CG); renderAdm(); });
+  renderCfg(); pushDB(); showToast('🗑️ Group deleted!');
+}
+
+function changePW(){
+  const old = document.getElementById('s-pw-old').value;
+  const nw = document.getElementById('s-pw-new').value;
+  const cf = document.getElementById('s-pw-cf').value;
+  if(old !== DB.password){ showToast('❌ தவறான password!', true); return; }
+  if(!nw){ showToast('❌ New password தேவை!', true); return; }
+  if(nw !== cf){ showToast('❌ Passwords match ஆகவில்லை!', true); return; }
+  DB.password = nw; pushDB();
+  showToast('🔑 Password மாற்றப்பட்டது!');
+  ['s-pw-old','s-pw-new','s-pw-cf'].forEach(id => document.getElementById(id).value='');
+}
+
+// ══════════════════════════════════════
+// MODAL & TOAST
+// ══════════════════════════════════════
+function openGroupLock(gi, cb){
+  const gc = grpCfg(gi);
+  const grpName = gc.name;
+  showModal('🔒 '+grpName,`
+    <p style="color:var(--muted);font-size:12px;margin-bottom:14px;">${grpName}-க்கான password enter பண்ணவும்</p>
+    <div class="mfield"><label>Password</label>
+      <input type="password" id="grp-pw-inp" placeholder="••••••" style="letter-spacing:4px;text-align:center;" onkeydown="if(event.key==='Enter')confirmGroupLock(${gi})"></div>
+    <div id="grp-pw-err" style="color:var(--red);font-size:12px;min-height:18px;margin-top:4px;text-align:center;"></div>
+    <div class="mbtns">
+      <button class="mb-cancel" onclick="closeModal()">Cancel</button>
+      <button class="mb-ok" onclick="confirmGroupLock(${gi})">🔓 Enter</button>
+    </div>`);
+  setTimeout(()=>{const i=document.getElementById('grp-pw-inp');if(i)i.focus();},150);
+  window._grpLockCb = cb;
+}
+
+function confirmGroupLock(gi){
+  const inp = document.getElementById('grp-pw-inp');
+  const err = document.getElementById('grp-pw-err');
+  const pw = inp ? inp.value : '';
+  const gc = grpCfg(gi);
+  const correct = gc.password || 'group'+(gi+1);
+  if(pw === correct){
+    unlockedGroups[gi] = true;
+    closeModal();
+    CG = gi; CM = 1; CPT = 'mem';
+    ensureGroup(gi);
+    renderPub();
+  } else {
+    if(err) err.textContent = '❌ Wrong password!';
+    if(inp){ inp.value=''; inp.focus(); }
+  }
+}
+
+function showModal(title, body){
+  document.getElementById('modal-ttl').textContent = title;
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('modal-ov').classList.remove('hide');
+  setTimeout(() => {
+    const inp = document.querySelector('#modal-body input');
+    if(inp) inp.focus();
+  }, 100);
+}
+function closeModal(){ document.getElementById('modal-ov').classList.add('hide'); }
+function closeModalOut(e){ if(e.target===document.getElementById('modal-ov')) closeModal(); }
+function showToast(msg, err=false){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast'+(err?' err':'');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ══════════════════════════════════════
+// BOOT — Load app immediately, sync in background
+// ══════════════════════════════════════
+// App உடனடியாக load ஆகும்
+buildDefault();
+updateHomeStats();
+setSyncUI('busy', 'Connecting…');
+
+// Background-ல Firebase connect
+firebase.auth().signInAnonymously()
+  .then(() => {
+    startLiveSync();
+  })
+  .catch(() => {
+    // Auth fail — direct try
+    startLiveSync();
+  });
+</script>
+</body>
+</html>
