@@ -1221,13 +1221,13 @@ function whatsappBulkPending(){
   const lastDate = getLastDate(CM);
   const msg = `*${gc.name} - ${mo} பகுதி கட்டணம் வருமாறு*
 
-கீழ்கஂட உறுப்பினர் இன்னும் செலுத்தவில்லை:
+கீழ்கண்ட உறுப்பினர் இன்னும் செலுத்தவில்லை:
 ${mids.map((mid,i)=>(i+1)+'. '+DB.members[CG][mid].name).join('\n')}
 
 தொகை: *₹${amt}*
 கடைசி தேதி: *${lastDate}*
 
-தயவுசேய்து கடைசி தேதிக்குள் செலுத்தவும்.
+தயவுசெய்து கடைசி தேதிக்குள் செலுத்தவும்.
 
 *KMBSC* 🙏`;
   window.open('https://wa.me/?text='+encodeURIComponent(msg), '_blank');
