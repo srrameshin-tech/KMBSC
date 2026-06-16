@@ -1464,7 +1464,10 @@ function saveOrg(){
 
 function addGroup(){
   const ni = DB.groups.length;
-  DB.groups.push({name:'Group '+(ni+1),startMonth:0,startYear:2026,months:11,amount:100000,password:'group'+(ni+1)});
+  const now = new Date();
+  const curMonth = now.getMonth(); // 0=Jan
+  const curYear = now.getFullYear();
+  DB.groups.push({name:'Group '+(ni+1),startMonth:curMonth,startYear:curYear,months:11,amount:100000,password:'group'+(ni+1)});
   DB.members[ni] = {}; DB.payments[ni] = {}; DB.prizes[ni] = {};
   ensureGroup(ni);
   renderGrpTabs('adm-grp', () => { ensureGroup(CG); renderAdm(); });
