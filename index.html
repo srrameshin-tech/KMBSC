@@ -460,6 +460,19 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const DB_REF = db.ref('kmbsc');
 
+// Password hashing (SHA-256) — auto-migrates legacy plaintext passwords on next successful login
+async function sha256Hex(str){
+  const enc = new TextEncoder().encode(str);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function isHashFormat(str){ return typeof str === 'string' && /^[a-f0-9]{64}$/i.test(str); }
+async function verifyPassword(entered, stored){
+  if(!stored) return false;
+  if(isHashFormat(stored)) return (await sha256Hex(entered)) === stored;
+  return entered === stored; // legacy plaintext fallback
+}
+
 // ══════════════════════════════════════
 // STATE
 // ══════════════════════════════════════
@@ -722,9 +735,16 @@ function goAdm(){ showPage('pg-adm'); CAT='pay'; CM=getCurrentMonthNum(CG); ensu
 function goLock(){ showPage('pg-lock'); document.getElementById('pw-inp').value=''; document.getElementById('lock-err').textContent=''; }
 function logout(){ goHome(); }
 
-function tryLogin(){
+async function tryLogin(){
   const pw = document.getElementById('pw-inp').value;
-  if(pw === DB.password){ goAdm(); }
+  const ok = await verifyPassword(pw, DB.password);
+  if(ok){
+    if(!isHashFormat(DB.password)){
+      DB.password = await sha256Hex(pw); // auto-migrate legacy plaintext to hash
+      pushDB();
+    }
+    goAdm();
+  }
   else {
     const inp = document.getElementById('pw-inp');
     inp.classList.add('shake');
@@ -1502,14 +1522,15 @@ function deleteGroup(i){
   renderCfg(); pushDB(); showToast('🗑️ Group deleted!');
 }
 
-function changePW(){
+async function changePW(){
   const old = document.getElementById('s-pw-old').value;
   const nw = document.getElementById('s-pw-new').value;
   const cf = document.getElementById('s-pw-cf').value;
-  if(old !== DB.password){ showToast('❌ தவறான password!', true); return; }
+  const oldOk = await verifyPassword(old, DB.password);
+  if(!oldOk){ showToast('❌ தவறான password!', true); return; }
   if(!nw){ showToast('❌ New password தேவை!', true); return; }
   if(nw !== cf){ showToast('❌ Passwords match ஆகவில்லை!', true); return; }
-  DB.password = nw; pushDB();
+  DB.password = await sha256Hex(nw); pushDB();
   showToast('🔑 Password மாற்றப்பட்டது!');
   ['s-pw-old','s-pw-new','s-pw-cf'].forEach(id => document.getElementById(id).value='');
 }
