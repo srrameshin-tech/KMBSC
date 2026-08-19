@@ -106,14 +106,14 @@ async function getFirebaseIdToken() {
 
 // Registers this service account in kmbscAdmins so an admin can approve it in the app.
 async function selfRegister(idToken, uid, email) {
-  const url = `${FIREBASE_DB_URL}/kmbscAdmins/${uid}.json?auth=${idToken}`;
+  const url = `${FIREBASE_DB_URL}/kmbsc_admin/members/${uid}.json?auth=${idToken}`;
   const existing = await fetchJson(url).catch(() => null);
   if (existing && existing.email) return existing;
   const body = JSON.stringify({
-    email: email,
     name: 'Reminder Workflow',
-    approved: false,
-    role: 'reader',
+    email: email,
+    role: 'member',
+    status: 'pending',
     created: Date.now(),
   });
   await new Promise((resolve) => {
@@ -204,7 +204,7 @@ async function main() {
   console.log('Signed in successfully. uid=' + uid);
 
   const rec = await selfRegister(idToken, uid, FIREBASE_AUTH_EMAIL);
-  if (!rec || rec.approved !== true) {
+  if (!rec || rec.status !== 'approved') {
     console.log('');
     console.log('==========================================================');
     console.log(' This reminder account is not approved yet.');
@@ -224,7 +224,7 @@ async function main() {
   }
 
   console.log('Fetching member phone numbers...');
-  const phones = (await fetchJson(`${FIREBASE_DB_URL}/kmbscPrivate/phones.json?auth=${idToken}`)) || {};
+  const phones = (await fetchJson(`${FIREBASE_DB_URL}/kmbsc_private/phones.json?auth=${idToken}`)) || {};
 
   const groups = data.groups || [];
   const members = data.members || {};
