@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="KMBSC">
 <meta name="description" content="KMBSC Savings Chit Fund Manager - கூட்டு சீட்டு நிர்வாகம்">
-<meta name="app-build" content="20260819-0615">
+<meta name="app-build" content="20260819-0625">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -508,7 +508,7 @@ function logAppError(type, message, extra){
 function flushErrorLogQueue(){
   if(!errorLogQueue.length) return;
   const batch = errorLogQueue.splice(0, errorLogQueue.length);
-  batch.forEach(function(entry){ try{ db.ref('errorLogs').push(entry); }catch(e){} });
+  batch.forEach(function(entry){ try{ db.ref('errorLogs').push(entry).catch(function(){}); }catch(e){} });
 }
 window.addEventListener('error', function(e){ logAppError('JS Error', e.message, (e.filename||'')+':'+(e.lineno||'')+' '+(e.error&&e.error.stack?e.error.stack.slice(0,400):'')); });
 window.addEventListener('unhandledrejection', function(e){ const r=e.reason; logAppError('Unhandled Promise', r&&r.message?r.message:String(r), r&&r.stack?r.stack.slice(0,400):''); });
@@ -570,17 +570,17 @@ const DB_REF = db.ref('kmbsc');
 // AUTH + SECURE WRITE ENGINE
 // ══════════════════════════════════════
 const auth = firebase.auth();
-const ADMINS_REF = db.ref('kmbscAdmins');
-const PHONES_REF = db.ref('kmbscPrivate/phones');
+const ADMINS_REF = db.ref('kmbsc_admin/members');
+const PHONES_REF = db.ref('kmbsc_private/phones');
 
 let currentUser = null;      // firebase user object
-let myRec = null;            // this user's kmbscAdmins record
+let myRec = null;            // this user's kmbsc_admin/members record
 let isAdmin = false;         // approved === true
 let isOwner = false;         // approved === true && role === 'admin'
 let authMode = 'signin';     // 'signin' | 'signup'
 let signupName = '';
 let PHONES = {};             // {gi:{mid:phone}} — admins only
-let ALL_PEOPLE = {};         // kmbscAdmins snapshot — admins only
+let ALL_PEOPLE = {};         // kmbsc_admin/members snapshot — admins only
 
 let liveSyncStarted = false;
 let anonTried = false;
@@ -633,7 +633,7 @@ function saveMemberRec(gi, mid, opts){
   return dbWrite('kmbsc/members/' + gi + '/' + mid, stripPhone(mem), opts);
 }
 function savePhoneRec(gi, mid, phone){
-  return dbWrite('kmbscPrivate/phones/' + gi + '/' + mid, phone || null,
+  return dbWrite('kmbsc_private/phones/' + gi + '/' + mid, phone || null,
                  { silent: true, method: (phone ? 'set' : 'remove') });
 }
 function saveGroupsNode(opts){ return dbWrite('kmbsc/groups', DB.groups, opts); }
@@ -698,7 +698,7 @@ function runMigrationIfNeeded(raw){
     Object.keys(raw.members[gi] || {}).forEach(function(mid){
       const mem = raw.members[gi][mid];
       if(mem && mem.phone){
-        phoneMoves['kmbscPrivate/phones/' + gi + '/' + mid] = String(mem.phone);
+        phoneMoves['kmbsc_private/phones/' + gi + '/' + mid] = String(mem.phone);
         phoneMoves['kmbsc/members/' + gi + '/' + mid + '/phone'] = null;
         found = true;
       }
@@ -755,7 +755,7 @@ function renderAuthUI(){
     return;
   }
 
-  if(signedIn && myRec && myRec.approved === false){
+  if(signedIn && myRec && myRec.status === 'pending'){
     form.style.display = 'none';
     pend.style.display = 'block';
     title.textContent = 'Approval காத்திருப்பு';
@@ -812,7 +812,7 @@ function authSubmit(){
 
   p.then(function(){
     pwEl.value = '';
-    // The kmbscAdmins record is created inside onAuthStateChanged, once the DB token is ready.
+    // The kmbsc_admin/members record is created inside onAuthStateChanged, once the DB token is ready.
   }).catch(function(e){
     console.error('[auth] ' + authMode, e && e.code, e && e.message);
     errEl.textContent = authErrText(e);
@@ -859,14 +859,14 @@ function ensureAdminRecord(user){
   return ref.once('value').then(function(snap){
     if(snap.exists()) return;
     const base = {
-      email: user.email || '',
       name: signupName || (user.email || '').split('@')[0] || 'User',
+      email: user.email || '',
       created: Date.now()
     };
-    // Rules only permit approved:true when kmbscAdmins is empty (first user = owner).
-    const asOwner = Object.assign({}, base, { approved: true, role: 'admin' });
+    // Rules only permit the approved/admin pair when the members node is empty (first user).
+    const asOwner = Object.assign({}, base, { role: 'admin', status: 'approved' });
     return ref.set(asOwner).catch(function(){
-      const asPending = Object.assign({}, base, { approved: false, role: 'reader' });
+      const asPending = Object.assign({}, base, { role: 'member', status: 'pending' });
       return ref.set(asPending);
     });
   }).catch(function(e){
@@ -891,7 +891,7 @@ function detachMyRec(){ if(myRecRef){ myRecRef.off(); myRecRef = null; } }
 
 function applyMyRec(){
   const wasAdmin = isAdmin;
-  isAdmin = !!(myRec && myRec.approved === true);
+  isAdmin = !!(myRec && myRec.status === 'approved');
   isOwner = isAdmin && myRec.role === 'admin';
   if(isAdmin && !wasAdmin){
     startPhoneSync(); startPeopleSync();
@@ -935,7 +935,8 @@ function renderPeople(){
   if(!uids.length){ el.innerHTML = '<div style="font-size:12px;color:var(--muted);">யாரும் இல்லை.</div>'; return; }
   uids.sort(function(a, b){
     const ra = ALL_PEOPLE[a] || {}, rb = ALL_PEOPLE[b] || {};
-    if(!!ra.approved !== !!rb.approved) return ra.approved ? 1 : -1;
+    const aa = ra.status === 'approved', ab = rb.status === 'approved';
+    if(aa !== ab) return aa ? 1 : -1;
     return (ra.created || 0) - (rb.created || 0);
   });
   let html = '';
@@ -947,8 +948,8 @@ function renderPeople(){
     let right;
     if(me){
       right = '<span class="ppl-tag">நீங்கள்</span>';
-    } else if(r.approved === true){
-      right = '<span class="ppl-tag">' + (r.role === 'admin' ? 'Admin' : 'Reader') + '</span>' +
+    } else if(r.status === 'approved'){
+      right = '<span class="ppl-tag">' + (r.role === 'admin' ? 'Admin' : 'Member') + '</span>' +
               '<button class="ppl-btn ppl-no" onclick="peopleRevoke(\'' + uid + '\')">நீக்கு</button>';
     } else {
       right = '<button class="ppl-btn ppl-ok" onclick="peopleApprove(\'' + uid + '\')">Approve</button>' +
@@ -962,17 +963,17 @@ function renderPeople(){
 
 function peopleApprove(uid){
   if(currentUser && uid === currentUser.uid) return;
-  dbWrite('kmbscAdmins/' + uid, { approved: true, role: 'reader' },
+  dbWrite('kmbsc_admin/members/' + uid, { status: 'approved', role: 'member' },
           { method: 'update', okMsg: '✅ Approve ஆனது!' });
 }
 function peopleRevoke(uid){
   if(currentUser && uid === currentUser.uid){ showToast('உங்களை நீங்களே நீக்க முடியாது.', true); return; }
-  dbWrite('kmbscAdmins/' + uid, { approved: false, role: 'reader' },
+  dbWrite('kmbsc_admin/members/' + uid, { status: 'pending', role: 'member' },
           { method: 'update', okMsg: '🚫 Access நீக்கப்பட்டது.' });
 }
 function peopleReject(uid){
   if(currentUser && uid === currentUser.uid) return;
-  dbWrite('kmbscAdmins/' + uid, null, { method: 'remove', okMsg: '🗑️ நீக்கப்பட்டது.' });
+  dbWrite('kmbsc_admin/members/' + uid, null, { method: 'remove', okMsg: '🗑️ நீக்கப்பட்டது.' });
 }
 
 // ══════════════════════════════════════
@@ -1829,7 +1830,7 @@ function confirmDelMem(mid){
   delete DB.members[gi][mid];
   const removals = {};
   removals['kmbsc/members/'+gi+'/'+mid] = null;
-  removals['kmbscPrivate/phones/'+gi+'/'+mid] = null;
+  removals['kmbsc_private/phones/'+gi+'/'+mid] = null;
   for(let m=1; m<=months; m++){
     if(DB.payments[gi] && DB.payments[gi][m]) delete DB.payments[gi][m][mid];
     removals['kmbsc/payments/'+gi+'/'+m+'/'+mid] = null;
@@ -1949,7 +1950,7 @@ function deleteGroup(i){
   dbWrite('/', {
     'kmbsc': { org: DB.org, groups: DB.groups,
                members: cleanMembersForSave(), payments: DB.payments, prizes: DB.prizes },
-    'kmbscPrivate/phones': rebuiltPhones
+    'kmbsc_private/phones': rebuiltPhones
   }, {method:'update', okMsg:'🗑️ Group deleted!'});
 }
 
