@@ -63,7 +63,7 @@ async function main() {
   console.log('Signed in.');
 
   const snapshot = { exportedAt: new Date().toISOString() };
-  for (const node of ['kmbsc', 'kmbscPrivate', 'kmbscAdmins']) {
+  for (const node of ['kmbsc', 'kmbsc_private', 'kmbsc_admin']) {
     try {
       snapshot[node] = await getJson(`${DB_URL}/${node}.json?auth=${token}`);
       const n = snapshot[node] ? Object.keys(snapshot[node]).length : 0;
