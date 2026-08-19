@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="KMBSC">
 <meta name="description" content="KMBSC Savings Chit Fund Manager - கூட்டு சீட்டு நிர்வாகம்">
-<meta name="app-build" content="20260819-0625">
+<meta name="app-build" content="20260819-0645">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -587,6 +587,7 @@ let anonTried = false;
 let migrationDone = false;
 let myRecRef = null, peopleRef = null, phonesRef = null;
 let lastRaw = null;   // last raw kmbsc snapshot, for the one-time migration
+let firstDataLoaded = false;
 
 // ---------------- dbWrite: two attempts, calm message, never a raw error ----------------
 function dbWrite(path, value, opts){
@@ -1190,6 +1191,7 @@ function startLiveSync(){
       normalizeDB(data);
       DB = data;
       mergePhones();
+      if(!firstDataLoaded){ firstDataLoaded = true; CM = getCurrentMonthNum(CG); }
       runMigrationIfNeeded(lastRaw);
     } else {
       buildDefault();
@@ -1219,6 +1221,8 @@ function goPub(){
   if(!wasOnPub){
     CG = 0;
     CPT = 'mem';
+    CM = getCurrentMonthNum(CG);
+    ensureGroup(CG);
   }
   renderPub();
 }
