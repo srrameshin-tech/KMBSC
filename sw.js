@@ -1,20 +1,16 @@
-const CACHE_NAME = 'kmbsc-v1';
+const CACHE_NAME = 'kmbsc-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
   '/icon-192.png',
-  '/icon-512.png',
-  'https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;600;700&family=Poppins:wght@400;500;600;700;800&display=swap',
-  'https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js',
-  'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js',
-  'https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js'
+  '/icon-512.png'
 ];
 
-// Install
+// Install — actually pre-cache the asset list
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(['/index.html', '/manifest.json']))
+    caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS).catch(() => {}))
   );
   self.skipWaiting();
 });
@@ -29,19 +25,25 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
-// Fetch - Network first, cache fallback
+// Never intercept Firebase traffic — cached auth/database responses cause stale data
+function isFirebase(url) {
+  return url.includes('firebaseio.com') ||
+         url.includes('firebasedatabase.app') ||
+         url.includes('identitytoolkit.googleapis.com') ||
+         url.includes('securetoken.googleapis.com') ||
+         url.includes('firebaseapp.com');
+}
+
+// Fetch — network first, cache fallback
 self.addEventListener('fetch', e => {
-  // Firebase requests - always network
-  if (e.request.url.includes('firebaseio.com') || 
-      e.request.url.includes('googleapis.com/identitytoolkit')) {
-    return;
-  }
-  
+  if (e.request.method !== 'GET') return;
+  if (isFirebase(e.request.url)) return;
+
   e.respondWith(
     fetch(e.request)
       .then(res => {
         const clone = res.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+        caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone)).catch(() => {});
         return res;
       })
       .catch(() => caches.match(e.request))
