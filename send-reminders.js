@@ -101,7 +101,31 @@ async function getFirebaseIdToken() {
     throw new Error(`Firebase Auth sign-in failed: ${JSON.stringify(result.json)}`);
   }
 
-  return result.json.idToken;
+  return { idToken: result.json.idToken, uid: result.json.localId };
+}
+
+// Registers this service account in kmbscAdmins so an admin can approve it in the app.
+async function selfRegister(idToken, uid, email) {
+  const url = `${FIREBASE_DB_URL}/kmbscAdmins/${uid}.json?auth=${idToken}`;
+  const existing = await fetchJson(url).catch(() => null);
+  if (existing && existing.email) return existing;
+  const body = JSON.stringify({
+    email: email,
+    name: 'Reminder Workflow',
+    approved: false,
+    role: 'reader',
+    created: Date.now(),
+  });
+  await new Promise((resolve) => {
+    const req = https.request(url, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
+    }, (res) => { res.on('data', () => {}); res.on('end', resolve); });
+    req.on('error', () => resolve());
+    req.write(body);
+    req.end();
+  });
+  return null;
 }
 function postForm(url, formObj) {
   const body = Object.entries(formObj)
@@ -176,8 +200,20 @@ function buildMessage(memberName, groupName, monthText, amount) {
 
 async function main() {
   console.log('Signing in to Firebase Auth...');
-  const idToken = await getFirebaseIdToken();
-  console.log('Signed in successfully.');
+  const { idToken, uid } = await getFirebaseIdToken();
+  console.log('Signed in successfully. uid=' + uid);
+
+  const rec = await selfRegister(idToken, uid, FIREBASE_AUTH_EMAIL);
+  if (!rec || rec.approved !== true) {
+    console.log('');
+    console.log('==========================================================');
+    console.log(' This reminder account is not approved yet.');
+    console.log(' Open the KMBSC app -> Admin -> Settings -> People');
+    console.log(' and approve: ' + FIREBASE_AUTH_EMAIL);
+    console.log(' No reminders were sent this run.');
+    console.log('==========================================================');
+    return;
+  }
 
   console.log('Fetching KMBSC data from Firebase...');
   const data = await fetchJson(`${FIREBASE_DB_URL}/kmbsc.json?auth=${idToken}`);
@@ -186,6 +222,9 @@ async function main() {
     console.log('No data found at kmbsc path. Exiting.');
     return;
   }
+
+  console.log('Fetching member phone numbers...');
+  const phones = (await fetchJson(`${FIREBASE_DB_URL}/kmbscPrivate/phones.json?auth=${idToken}`)) || {};
 
   const groups = data.groups || [];
   const members = data.members || {};
@@ -225,7 +264,8 @@ async function main() {
         continue;
       }
 
-      const toNumber = toWhatsAppNumber(member.phone);
+      const phoneVal = (phones[gi] && phones[gi][mid]) || member.phone;
+      const toNumber = toWhatsAppNumber(phoneVal);
       if (!toNumber) {
         console.log(`  ⚠ ${member.name} — no phone number, skipping`);
         continue;
