@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-08-22T20:49:04.638Z",
+  "exportedAt": "2026-11-15T00:03:53.730Z",
   "kmbsc": {
     "groups": [
       {
@@ -652,54 +652,54 @@
             "paid": false
           },
           "m1778343083372": {
-            "amount": 100000,
-            "date": "09/05/2026",
-            "paid": false
+            "amount": 8500,
+            "date": "10/09/2026",
+            "paid": true
           },
           "m1778363324490": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 8500,
+            "date": "13/09/2026",
+            "paid": true
           },
           "m1778363356681": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 8500,
+            "date": "09/09/2026",
+            "paid": true
           },
           "m1778363393219": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 8500,
+            "date": "10/09/2026",
+            "paid": true
           },
           "m1778363433325": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 8500,
+            "date": "20/09/2026",
+            "paid": true
           },
           "m1778363473037": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 8500,
+            "date": "13/09/2026",
+            "paid": true
           },
           "m1778363507820": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 8500,
+            "date": "06/09/2026",
+            "paid": true
           },
           "m1778363539808": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 8500,
+            "date": "19/09/2026",
+            "paid": true
           },
           "m1778363579187": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 8500,
+            "date": "01/09/2026",
+            "paid": true
           },
           "m1778363669096": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 8500,
+            "date": "18/09/2026",
+            "paid": true
           },
           "notes": {
             "amount": 100000,
@@ -714,54 +714,54 @@
             "paid": false
           },
           "m1778343083372": {
-            "amount": 100000,
-            "date": "09/05/2026",
-            "paid": false
+            "amount": 9300,
+            "date": "14/10/2026",
+            "paid": true
           },
           "m1778363324490": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 9300,
+            "date": "12/10/2026",
+            "paid": true
           },
           "m1778363356681": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 9300,
+            "date": "10/10/2026",
+            "paid": true
           },
           "m1778363393219": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 9300,
+            "date": "14/10/2026",
+            "paid": true
           },
           "m1778363433325": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 9300,
+            "date": "21/10/2026",
+            "paid": true
           },
           "m1778363473037": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 9300,
+            "date": "18/10/2026",
+            "paid": true
           },
           "m1778363507820": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 9300,
+            "date": "05/10/2026",
+            "paid": true
           },
           "m1778363539808": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 9300,
+            "date": "07/10/2026",
+            "paid": true
           },
           "m1778363579187": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 9300,
+            "date": "01/10/2026",
+            "paid": true
           },
           "m1778363669096": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 9300,
+            "date": "18/10/2026",
+            "paid": true
           },
           "notes": {
             "amount": 100000,
@@ -776,52 +776,52 @@
             "paid": false
           },
           "m1778343083372": {
-            "amount": 100000,
-            "date": "09/05/2026",
-            "paid": false
+            "amount": 10000,
+            "date": "11/11/2026",
+            "paid": true
           },
           "m1778363324490": {
-            "amount": 100000,
+            "amount": 10000,
             "date": "10/05/2026",
             "paid": false
           },
           "m1778363356681": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 10000,
+            "date": "10/11/2026",
+            "paid": true
           },
           "m1778363393219": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 10000,
+            "date": "04/11/2026",
+            "paid": true
           },
           "m1778363433325": {
-            "amount": 100000,
+            "amount": 10000,
             "date": "10/05/2026",
             "paid": false
           },
           "m1778363473037": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 10000,
+            "date": "03/11/2026",
+            "paid": true
           },
           "m1778363507820": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 10000,
+            "date": "05/11/2026",
+            "paid": true
           },
           "m1778363539808": {
-            "amount": 100000,
+            "amount": 10000,
             "date": "10/05/2026",
             "paid": false
           },
           "m1778363579187": {
-            "amount": 100000,
-            "date": "10/05/2026",
-            "paid": false
+            "amount": 10000,
+            "date": "01/11/2026",
+            "paid": true
           },
           "m1778363669096": {
-            "amount": 100000,
+            "amount": 10000,
             "date": "10/05/2026",
             "paid": false
           },
@@ -1337,54 +1337,54 @@
             "paid": false
           },
           "m1777280267312": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 8500,
+            "date": "20/09/2026",
+            "paid": true
           },
           "m1777280305342": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 8500,
+            "date": "06/09/2026",
+            "paid": true
           },
           "m1777280342030": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 8500,
+            "date": "09/09/2026",
+            "paid": true
           },
           "m1777280411525": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 8500,
+            "date": "18/09/2026",
+            "paid": true
           },
           "m1777280463781": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 8500,
+            "date": "19/09/2026",
+            "paid": true
           },
           "m1777280537378": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 8500,
+            "date": "09/09/2026",
+            "paid": true
           },
           "m1777280573719": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 8500,
+            "date": "16/09/2026",
+            "paid": true
           },
           "m1777280608255": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 8500,
+            "date": "20/09/2026",
+            "paid": true
           },
           "m1777280630998": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 8500,
+            "date": "16/09/2026",
+            "paid": true
           },
           "m1777280657303": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 8500,
+            "date": "09/09/2026",
+            "paid": true
           },
           "notes": {
             "amount": 100000,
@@ -1399,54 +1399,54 @@
             "paid": false
           },
           "m1777280267312": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 9300,
+            "date": "20/10/2026",
+            "paid": true
           },
           "m1777280305342": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 9300,
+            "date": "05/10/2026",
+            "paid": true
           },
           "m1777280342030": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 9300,
+            "date": "10/10/2026",
+            "paid": true
           },
           "m1777280411525": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 9300,
+            "date": "16/10/2026",
+            "paid": true
           },
           "m1777280463781": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 9300,
+            "date": "18/10/2026",
+            "paid": true
           },
           "m1777280537378": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 9300,
+            "date": "14/10/2026",
+            "paid": true
           },
           "m1777280573719": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 9300,
+            "date": "19/10/2026",
+            "paid": true
           },
           "m1777280608255": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 9300,
+            "date": "20/10/2026",
+            "paid": true
           },
           "m1777280630998": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 9300,
+            "date": "19/10/2026",
+            "paid": true
           },
           "m1777280657303": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 9300,
+            "date": "14/10/2026",
+            "paid": true
           },
           "notes": {
             "amount": 100000,
@@ -1461,54 +1461,54 @@
             "paid": false
           },
           "m1777280267312": {
-            "amount": 100000,
+            "amount": 10000,
             "date": "27/04/2026",
             "paid": false
           },
           "m1777280305342": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 10000,
+            "date": "05/11/2026",
+            "paid": true
           },
           "m1777280342030": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 10000,
+            "date": "10/11/2026",
+            "paid": true
           },
           "m1777280411525": {
-            "amount": 100000,
+            "amount": 10000,
             "date": "27/04/2026",
             "paid": false
           },
           "m1777280463781": {
-            "amount": 100000,
+            "amount": 10000,
             "date": "27/04/2026",
             "paid": false
           },
           "m1777280537378": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 10000,
+            "date": "09/11/2026",
+            "paid": true
           },
           "m1777280573719": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 10000,
+            "date": "09/11/2026",
+            "paid": true
           },
           "m1777280608255": {
-            "amount": 100000,
+            "amount": 10000,
             "date": "27/04/2026",
             "paid": false
           },
           "m1777280630998": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 10000,
+            "date": "09/11/2026",
+            "paid": true
           },
           "m1777280657303": {
-            "amount": 100000,
-            "date": "27/04/2026",
-            "paid": false
+            "amount": 10000,
+            "date": "10/11/2026",
+            "paid": true
           },
           "notes": {
             "amount": 100000,
